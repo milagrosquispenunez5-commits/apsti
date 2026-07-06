@@ -66,22 +66,21 @@ img{
 a{
     color:inherit;
 }
-.bienvenida{
+.overlay h2.bienvenida{
     color: #7a0000;
+    font-size: 168px;
+    -webkit-text-stroke: 1.5px #fff;
 
 }
 
-/* efecto maquina de escribir 100% CSS (sin JS), sobre el span interno */
+
 .texto-escritura{
     display:inline-block;
     overflow:hidden;
     white-space:nowrap;
     vertical-align:bottom;
-    border-right:3px solid currentColor;
     width:0;
-    animation:
-        escribirTexto 1s steps(5, end) .9s forwards,
-        parpadeoCursor .75s step-end .9s infinite;
+    animation:escribirTexto 1s steps(5, end) .9s forwards;
 }
 
 @keyframes escribirTexto{
@@ -89,15 +88,10 @@ a{
     to{ width:5ch; }
 }
 
-@keyframes parpadeoCursor{
-    50%{ border-color:transparent; }
-}
-
 @media (prefers-reduced-motion: reduce){
     .texto-escritura{
         animation:none;
         width:5ch;
-        border-right:none;
     }
 }
 
@@ -473,15 +467,7 @@ section h2{
     font-weight:700;
 }
 
-section h2::after{
-    content:"";
-    display:block;
-    width:56px;
-    height:4px;
-    margin:14px auto var(--space-4);
-    background:var(--color-brand);
-    border-radius:var(--radius-full);
-}
+
 
 @media (max-width:700px){
     section{
