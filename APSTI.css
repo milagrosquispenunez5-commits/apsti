@@ -1,31 +1,29 @@
-/*=========================
-      TOKENS DE DISEÑO
-=========================*/
+
 
 :root{
-    /* color de marca (se conserva el rojo institucional existente) */
+    
     --color-brand:#b30000;
     --color-brand-deep:#7a0000;
     --color-brand-bright:#d4001c;
 
-    /* neutros cálidos, sin negro ni blanco puros */
+    
     --color-ink:#231e1c;
     --color-body:#4a4340;
     --color-bg:#f7f5f3;
     --color-surface:#ffffff;
     --color-border:#e9e2dd;
 
-    /* escala de radios: pills para botones/nav, 16px para tarjetas, 8px para inputs */
+    
     --radius-sm:8px;
     --radius-md:16px;
     --radius-full:999px;
 
-    /* sombras matizadas hacia el rojo de marca, nunca negro puro */
+    
     --shadow-sm:0 2px 10px rgba(70,15,10,.08);
     --shadow-md:0 12px 30px rgba(70,15,10,.14);
     --shadow-lg:0 22px 48px rgba(70,15,10,.20);
 
-    /* ritmo de espaciado */
+    
     --space-1:.5rem;
     --space-2:1rem;
     --space-3:1.5rem;
@@ -35,11 +33,13 @@
 
     --ease:cubic-bezier(.16,1,.3,1);
     --header-h:158px;
-}
 
-/*=========================
-      ESTILOS GENERALES
-=========================*/
+    /* nombres de scroll-timeline por sección, visibles fuera de su árbol
+       (para que los enlaces del menú, en <nav>, puedan usarlos) */
+    timeline-scope:
+        --tl-inicio, --tl-nosotros, --tl-unidades, --tl-modulos,
+        --tl-malla, --tl-beneficios, --tl-docentes, --tl-galeria, --tl-contacto;
+}
 
 *{
     margin:0;
@@ -71,6 +71,36 @@ a{
 
 }
 
+/* efecto maquina de escribir 100% CSS (sin JS), sobre el span interno */
+.texto-escritura{
+    display:inline-block;
+    overflow:hidden;
+    white-space:nowrap;
+    vertical-align:bottom;
+    border-right:3px solid currentColor;
+    width:0;
+    animation:
+        escribirTexto 1s steps(5, end) .9s forwards,
+        parpadeoCursor .75s step-end .9s infinite;
+}
+
+@keyframes escribirTexto{
+    from{ width:0; }
+    to{ width:5ch; }
+}
+
+@keyframes parpadeoCursor{
+    50%{ border-color:transparent; }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .texto-escritura{
+        animation:none;
+        width:5ch;
+        border-right:none;
+    }
+}
+
 ::selection{
     background:var(--color-brand);
     color:#fff;
@@ -93,10 +123,6 @@ a{
     }
 }
 
-/*=========================
-        HEADER
-=========================*/
-
 header{
     width:100%;
     position:fixed;
@@ -105,10 +131,6 @@ header{
     z-index:1000;
     box-shadow:var(--shadow-md);
 }
-
-/*=========================
-     BARRA SUPERIOR
-=========================*/
 
 .header-top{
     width:100%;
@@ -133,10 +155,6 @@ header{
     width:125px;
 }
 
-/*=========================
-        TITULO
-=========================*/
-
 .titulo{
     width:75%;
 }
@@ -149,10 +167,6 @@ header{
     font-weight:700;
     letter-spacing:.01em;
 }
-
-/*=========================
-        MENU
-=========================*/
 
 .menu{
     background:var(--color-brand-deep);
@@ -184,6 +198,50 @@ header{
 .menu ul li a:hover{
     background:#fff;
     color:var(--color-brand-deep);
+}
+
+/*=========================
+   MENU ACTIVO AL HACER SCROLL
+   (view-timeline por sección + timeline-scope,
+   sin JS. El link se resalta mientras su sección
+   ocupa el centro del viewport)
+=========================*/
+
+#inicio{ view-timeline-name:--tl-inicio; }
+#nosotros{ view-timeline-name:--tl-nosotros; }
+#unidades{ view-timeline-name:--tl-unidades; }
+#modulos{ view-timeline-name:--tl-modulos; }
+#malla{ view-timeline-name:--tl-malla; }
+#beneficios{ view-timeline-name:--tl-beneficios; }
+#docentes{ view-timeline-name:--tl-docentes; }
+#galeria{ view-timeline-name:--tl-galeria; }
+#contacto{ view-timeline-name:--tl-contacto; }
+
+@keyframes resaltarLink{
+    0%, 100%{
+        background:transparent;
+        color:#fff;
+    }
+    35%, 65%{
+        background:#fff;
+        color:var(--color-brand-deep);
+    }
+}
+
+.menu ul li a[href="#inicio"]{ animation:resaltarLink linear both; animation-timeline:--tl-inicio; animation-range:cover 0% cover 100%; }
+.menu ul li a[href="#nosotros"]{ animation:resaltarLink linear both; animation-timeline:--tl-nosotros; animation-range:cover 0% cover 100%; }
+.menu ul li a[href="#unidades"]{ animation:resaltarLink linear both; animation-timeline:--tl-unidades; animation-range:cover 0% cover 100%; }
+.menu ul li a[href="#modulos"]{ animation:resaltarLink linear both; animation-timeline:--tl-modulos; animation-range:cover 0% cover 100%; }
+.menu ul li a[href="#malla"]{ animation:resaltarLink linear both; animation-timeline:--tl-malla; animation-range:cover 0% cover 100%; }
+.menu ul li a[href="#beneficios"]{ animation:resaltarLink linear both; animation-timeline:--tl-beneficios; animation-range:cover 0% cover 100%; }
+.menu ul li a[href="#docentes"]{ animation:resaltarLink linear both; animation-timeline:--tl-docentes; animation-range:cover 0% cover 100%; }
+.menu ul li a[href="#galeria"]{ animation:resaltarLink linear both; animation-timeline:--tl-galeria; animation-range:cover 0% cover 100%; }
+.menu ul li a[href="#contacto"]{ animation:resaltarLink linear both; animation-timeline:--tl-contacto; animation-range:cover 0% cover 100%; }
+
+@media (prefers-reduced-motion: reduce){
+    .menu ul li a{
+        animation:none !important;
+    }
 }
 
 @media (max-width:900px){
@@ -261,10 +319,6 @@ header{
         background:rgba(255,255,255,.08);
     }
 }
-
-/*=========================
-        BANNER
-=========================*/
 
 .banner{
     position:relative;
@@ -407,10 +461,6 @@ header{
     }
 }
 
-/*=========================
-      SECCIONES
-=========================*/
-
 section{
     padding:var(--space-8) 10%;
 }
@@ -438,10 +488,6 @@ section h2::after{
         padding:var(--space-6) 6%;
     }
 }
-
-/*=========================
-      SOBRE NOSOTROS
-=========================*/
 
 .contenedor{
     display:flex;
@@ -491,10 +537,6 @@ section h2::after{
     }
 }
 
-/*=========================
-      TARJETAS (base)
-=========================*/
-
 .cards{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -527,12 +569,8 @@ section h2::after{
     color:var(--color-body);
 }
 
-/*=========================
-   UNIDADES DIDACTICAS
-   (tarjetas con insignia de icono)
-=========================*/
-
-#unidades .card i{
+#unidades .card i,
+#beneficios .card i{
     display:inline-flex;
     align-items:center;
     justify-content:center;
@@ -546,15 +584,11 @@ section h2::after{
     transition:transform .35s var(--ease), background .35s var(--ease);
 }
 
-#unidades .card:hover i{
+#unidades .card:hover i,
+#beneficios .card:hover i{
     transform:scale(1.08) rotate(-4deg);
     background:color-mix(in srgb, var(--color-brand) 16%, transparent);
 }
-
-/*=========================
-        MODULOS
-   (tarjetas numeradas)
-=========================*/
 
 #modulos .cards{
     counter-reset:modulo;
@@ -584,11 +618,6 @@ section h2::after{
     color:var(--color-brand);
 }
 
-/*=========================
-   CARRUSEL DE MÓDULOS
-   (animación automática CSS keyframes)
-=========================*/
-
 .modulo-carrusel{
     position:relative;
     width:100%;
@@ -609,7 +638,7 @@ section h2::after{
     position:absolute;
     inset:0;
     opacity:0;
-    animation:moduloFade 24s infinite;
+    animation:var(--animation-name, modulo1Fade) var(--duration, 12s) infinite;
     animation-delay:var(--delay);
     will-change:opacity, transform;
 }
@@ -622,15 +651,30 @@ section h2::after{
     border-radius:var(--radius-md);
 }
 
-@keyframes moduloFade{
+@keyframes modulo1Fade{
     0%    { opacity:0;   transform:scale(1.05); }
-    4%    { opacity:1;   transform:scale(1.02); }
-    10%   { opacity:1;   transform:scale(1); }
-    14%   { opacity:0;   transform:scale(1); }
+    5%    { opacity:1;   transform:scale(1.02); }
+    28%   { opacity:1;   transform:scale(1); }
+    33.3% { opacity:0;   transform:scale(1); }
     100%  { opacity:0;   transform:scale(1.05); }
 }
 
-/* Indicadores de posición (puntos) */
+@keyframes modulo2Fade{
+    0%    { opacity:0;   transform:scale(1.05); }
+    2.5%  { opacity:1;   transform:scale(1.02); }
+    10%   { opacity:1;   transform:scale(1); }
+    12.5% { opacity:0;   transform:scale(1); }
+    100%  { opacity:0;   transform:scale(1.05); }
+}
+
+@keyframes modulo3Fade{
+    0%    { opacity:0;   transform:scale(1.05); }
+    8%    { opacity:1;   transform:scale(1.02); }
+    42%   { opacity:1;   transform:scale(1); }
+    50%   { opacity:0;   transform:scale(1); }
+    100%  { opacity:0;   transform:scale(1.05); }
+}
+
 .modulo-carrusel::after{
     content:"";
     position:absolute;
@@ -642,7 +686,6 @@ section h2::after{
     pointer-events:none;
 }
 
-/* Borde inferior degradado sobre la imagen */
 .modulo-carrusel::before{
     content:"";
     position:absolute;
@@ -664,10 +707,43 @@ section h2::after{
     }
 }
 
-/*=========================
-        DOCENTES
-   (tarjetas con avatar circular)
-=========================*/
+#malla .card{
+    text-align:left;
+}
+
+#malla .card h3{
+    text-align:center;
+    color:var(--color-brand);
+    padding-bottom:var(--space-1);
+    margin-bottom:var(--space-2);
+    border-bottom:2px solid var(--color-border);
+}
+
+#malla .card ul{
+    list-style:none;
+}
+
+#malla .card li{
+    position:relative;
+    padding:8px 0 8px 26px;
+    font-size:.95rem;
+    color:var(--color-body);
+    border-bottom:1px dashed var(--color-border);
+}
+
+#malla .card li:last-child{
+    border-bottom:none;
+}
+
+#malla .card li::before{
+    content:"\f00c";
+    font-family:"Font Awesome 6 Free";
+    font-weight:900;
+    position:absolute;
+    left:0;
+    color:var(--color-brand);
+    font-size:.8rem;
+}
 
 #docentes .card img{
     width:120px;
@@ -679,29 +755,27 @@ section h2::after{
     box-shadow:var(--shadow-sm);
 }
 
-/*=========================
-   REVELADO AL HACER SCROLL
-   (activado por script.js)
-=========================*/
+@keyframes revelarAlEntrar{
+    from{
+        opacity:0;
+        transform:translateY(24px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
 
 .card,
 .titulo,
 .texto,
 .imagen{
-    opacity:0;
-    transform:translateY(24px);
-    transition:opacity .7s var(--ease), transform .7s var(--ease);
+    animation:revelarAlEntrar linear both;
+    animation-timeline:view();
+    animation-range:entry 0% entry 40%;
 }
 
-.card.mostrar,
-.titulo.mostrar,
-.texto.mostrar,
-.imagen.mostrar{
-    opacity:1;
-    transform:translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce){
+@supports not (animation-timeline: view()){
     .card,
     .titulo,
     .texto,
@@ -711,13 +785,16 @@ section h2::after{
     }
 }
 
-/*=========================
-        GALERIA
-   (filmstrip: posición + opacidad en un mismo
-   keyframe, cada foto desfasada con --delay
-   negativo. Siempre 1 foto centrada + vecinas
-   semitransparentes a los lados. Sin JS.)
-=========================*/
+@media (prefers-reduced-motion: reduce){
+    .card,
+    .titulo,
+    .texto,
+    .imagen{
+        animation:none;
+        opacity:1;
+        transform:none;
+    }
+}
 
 .galeria-carrusel{
     position:relative;
@@ -745,6 +822,10 @@ section h2::after{
     will-change:opacity, transform;
 }
 
+.galeria-carrusel:hover .galeria-slide{
+    animation-play-state:paused;
+}
+
 .galeria-slide img{
     width:100%;
     height:100%;
@@ -755,9 +836,7 @@ section h2::after{
 }
 
 @keyframes galeriaFilmstrip{
-    /* cada foto: aparece a la derecha, ESPERA 2s, salta al centro,
-       ESPERA 2s, salta a la izquierda, ESPERA 2s, sale.
-       (paso = 2.5s = 2s de espera + .5s de salto; 28 fotos x 2.5s = 70s) */
+    
     0%      { transform:translate(-50%,-50%) translateX(300%)  scale(.82); opacity:0; }
     .714%   { transform:translate(-50%,-50%) translateX(105%)  scale(.88); opacity:.35; }
     3.571%  { transform:translate(-50%,-50%) translateX(105%)  scale(.88); opacity:.35; }
@@ -790,10 +869,6 @@ section h2::after{
         width:88%;
     }
 }
-
-/*=========================
-        CONTACTO
-=========================*/
 
 #contacto{
     background:var(--color-surface);
@@ -862,10 +937,6 @@ form button:active{
     transform:scale(.98);
 }
 
-/*=========================
-        FOOTER
-=========================*/
-
 footer{
     background:var(--color-ink);
     color:#e9e2de;
@@ -906,29 +977,59 @@ footer p{
 
 /*=========================
    BOTON VOLVER ARRIBA
-   (creado por script.js, id="subir")
+   (enlace <a href="#inicio"> fijo; el scroll suave ya
+   lo da html{scroll-behavior:smooth}. Aparece/desaparece
+   con animation-timeline:scroll(root), sin JS)
 =========================*/
 
-#subir{
-    display:none;
+@keyframes mostrarVolverArriba{
+    from{ opacity:0; }
+    to{ opacity:1; }
+}
+
+.volver-arriba{
     position:fixed;
     right:24px;
     bottom:24px;
     width:48px;
     height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     border:none;
     border-radius:50%;
     background:var(--color-brand);
     color:#fff;
     font-size:1.2rem;
     line-height:1;
+    text-decoration:none;
     cursor:pointer;
     box-shadow:var(--shadow-md);
     z-index:900;
+    pointer-events:none;
     transition:background .3s var(--ease), transform .2s var(--ease);
+    animation:mostrarVolverArriba linear both;
+    animation-timeline:scroll(root);
+    animation-range:500px 700px;
 }
 
-#subir:hover{
+.volver-arriba:hover{
     background:var(--color-brand-deep);
     transform:translateY(-3px);
+}
+
+/* navegadores sin soporte: mostrar siempre en vez de quedar oculto */
+@supports not (animation-timeline: scroll(root)){
+    .volver-arriba{
+        opacity:1;
+        pointer-events:auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .volver-arriba{
+        animation:none;
+        opacity:1;
+        pointer-events:auto;
+    }
 }
