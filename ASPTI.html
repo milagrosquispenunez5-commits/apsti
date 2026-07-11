@@ -510,17 +510,19 @@
 
         <h2>Contáctanos</h2>
 
-        <form>
+        <form id="form-contacto">
 
-            <input type="text" placeholder="Nombre">
+            <input type="text" name="nombre" placeholder="Nombre" required maxlength="100">
 
-            <input type="email" placeholder="Correo">
+            <input type="email" name="correo" placeholder="Correo" required maxlength="150">
 
-            <textarea placeholder="Escribe tu mensaje"></textarea>
+            <textarea name="mensaje" placeholder="Escribe tu mensaje" required maxlength="5000"></textarea>
 
             <button type="submit">
                 Enviar
             </button>
+
+            <p id="estado-envio" role="status"></p>
 
         </form>
 
@@ -540,6 +542,31 @@
     <a href="#inicio" class="volver-arriba" aria-label="Volver arriba">
         <i class="fa-solid fa-arrow-up"></i>
     </a>
+
+    <script>
+        const formulario = document.getElementById('form-contacto');
+        const estado = document.getElementById('estado-envio');
+
+        formulario.addEventListener('submit', async (evento) => {
+            evento.preventDefault();
+            estado.textContent = 'Enviando…';
+            try {
+                const respuesta = await fetch('controlador/guardar.php', {
+                    method: 'POST',
+                    body: new URLSearchParams(new FormData(formulario)),
+                });
+                const cuerpo = await respuesta.json();
+                if (respuesta.ok) {
+                    estado.textContent = 'Mensaje enviado ✓';
+                    formulario.reset();
+                } else {
+                    estado.textContent = cuerpo.error ?? 'No se pudo enviar el mensaje.';
+                }
+            } catch {
+                estado.textContent = 'Error de conexión con el servidor.';
+            }
+        });
+    </script>
 
 </body>
 
