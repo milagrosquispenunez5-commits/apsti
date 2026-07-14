@@ -32,6 +32,12 @@
                 </h1>
             </div>
 
+            <div class="header-acciones">
+                <button onclick="abrirLogin()" class="btn-iniciar-sesion" type="button" aria-label="Iniciar sesión">
+                    <i class="fa-solid fa-sign-in-alt"></i> Iniciar sesión
+                </button>
+            </div>
+
         </div>
 
         <nav class="menu">
@@ -47,12 +53,7 @@
                 <li><a href="#docentes">Docentes</a></li>
                 <li><a href="#galeria">Galeria</a></li>
                 <li><a href="#contacto">Contacto</a></li>
-
-                <li>
-                    <a href="javascript:void(0);" id="abrirMesaPartes" role="button">
-                       <i class="fa-solid fa-user-lock"></i> Mesa de Partes
-                    </a>
-               </li>
+                <li><a href="#mesapartes">Mesa de Partes</a></li>
 
             </ul>
 
@@ -512,6 +513,40 @@
         </div>
 
     </section>
+    <section id="mesapartes">
+        <h2>Mesa de Partes</h2>
+
+        <div class="contenedor">
+
+            <div class="texto">
+
+                <p>Envía aquí tus solicitudes y trámites administrativos. Recibirás una confirmación por correo.</p>
+
+                <form id="form-mesapartes">
+
+                    <input type="text" name="nombre" placeholder="Nombre" required maxlength="100">
+
+                    <input type="text" name="documento" placeholder="Documento (DNI/RUC)" required maxlength="20">
+
+                    <input type="email" name="correo" placeholder="Correo" required maxlength="150">
+
+                    <input type="text" name="asunto" placeholder="Asunto" required maxlength="150">
+
+                    <textarea name="descripcion" placeholder="Descripción del trámite" required maxlength="5000"></textarea>
+
+                    <input type="hidden" name="tipo" value="mesa">
+
+                    <button type="submit">Enviar trámite</button>
+
+                    <p id="estado-mesapartes" role="status"></p>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </section>
     <section id="contacto">
 
         <h2>Contáctanos</h2>
@@ -611,10 +646,7 @@
             });
         }
 
-        document.getElementById('abrirMesaPartes').addEventListener('click', function (evento) {
-            evento.preventDefault();
-            abrirLogin();
-        });
+        // El enlace de Mesa de Partes ahora apunta a la sección #mesapartes
 
         function abrirLogin() {
             document.getElementById('loginModal').style.display = 'flex';
@@ -715,6 +747,31 @@
                 cerrarBiblioteca();
             }
         });
+
+        const formMesa = document.getElementById('form-mesapartes');
+        const estadoMesa = document.getElementById('estado-mesapartes');
+
+        if (formMesa) {
+            formMesa.addEventListener('submit', async (evento) => {
+                evento.preventDefault();
+                estadoMesa.textContent = 'Enviando…';
+                try {
+                    const respuesta = await fetch('controlador/guardar.php', {
+                        method: 'POST',
+                        body: new URLSearchParams(new FormData(formMesa)),
+                    });
+                    const cuerpo = await respuesta.json();
+                    if (respuesta.ok) {
+                        estadoMesa.textContent = 'Trámite enviado ✓';
+                        formMesa.reset();
+                    } else {
+                        estadoMesa.textContent = cuerpo.error ?? 'No se pudo enviar el trámite.';
+                    }
+                } catch {
+                    estadoMesa.textContent = 'Error de conexión con el servidor.';
+                }
+            });
+        }
     </script>
 
 </body>

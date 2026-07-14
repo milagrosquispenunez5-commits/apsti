@@ -162,6 +162,33 @@ header{
     letter-spacing:.01em;
 }
 
+.header-acciones{
+    position:absolute;
+    right:50px;
+    top:50%;
+    transform:translateY(-50%);
+}
+
+.btn-iniciar-sesion{
+    color:#fff;
+    background:rgba(255,255,255,.2);
+    border:1px solid rgba(255,255,255,.4);
+    font-size:14px;
+    font-weight:600;
+    padding:8px 16px;
+    border-radius:var(--radius-full);
+    cursor:pointer;
+    transition:background .3s var(--ease), border-color .3s var(--ease);
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.btn-iniciar-sesion:hover{
+    background:rgba(255,255,255,.3);
+    border-color:rgba(255,255,255,.6);
+}
+
 .menu{
     background:var(--color-brand-deep);
     height:55px;
@@ -243,6 +270,15 @@ header{
         padding:0 20px 0 125px;
     }
 
+    .header-acciones{
+        right:20px;
+    }
+
+    .btn-iniciar-sesion{
+        font-size:13px;
+        padding:7px 14px;
+    }
+
     .menu ul{
         gap:8px;
     }
@@ -281,6 +317,17 @@ header{
 
     .titulo h1{
         font-size:.95rem;
+    }
+
+    .header-acciones{
+        position:static;
+        transform:none;
+        margin-top:10px;
+    }
+
+    .btn-iniciar-sesion{
+        font-size:13px;
+        padding:7px 14px;
     }
 
     .menu{

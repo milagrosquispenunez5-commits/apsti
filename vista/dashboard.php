@@ -65,45 +65,77 @@ $mensajes = listarMensajes();
 
         header a:hover { background: var(--color-brand-deep); }
 
-        main { padding: 28px 20px 60px; }
+        main {
+            padding: 28px 20px 60px;
+            display: grid;
+            grid-template-columns: 1fr 250px;
+            gap: 28px;
+            align-items: start;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: sticky;
+            top: 28px;
+        }
 
         .resumen {
             font-size: .95rem;
             margin-bottom: 20px;
+            grid-column: 1 / -1;
         }
 
         .resumen strong { color: var(--color-brand); font-size: 1.1rem; }
 
         .paneles {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 18px;
-            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
         }
 
         .panel {
             background: var(--color-surface);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
+            border-radius: 0;
+            box-shadow: none;
             padding: 20px;
+            cursor: pointer;
+            transition: all .3s ease;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .panel:first-child {
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+        }
+
+        .panel:last-child {
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+            border-bottom: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .panel:hover {
+            background: var(--color-bg);
         }
 
         .panel h2 {
-            font-size: 1.05rem;
+            font-size: 1rem;
             color: var(--color-brand-deep);
-            margin-bottom: 10px;
+            margin-bottom: 0;
         }
 
         .panel p {
-            font-size: .95rem;
+            font-size: .9rem;
             line-height: 1.6;
             color: var(--color-body);
+            display: none;
         }
 
         .panel ul {
             list-style: none;
-            display: grid;
+            display: none;
             gap: 8px;
             margin-top: 10px;
         }
@@ -114,6 +146,30 @@ $mensajes = listarMensajes();
             padding: 8px 12px;
             font-size: .9rem;
             color: var(--color-ink);
+        }
+
+        .contenido-mensajes {
+            display: none;
+        }
+
+        .panel:last-child .contenido-mensajes {
+            display: block;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .panel:last-child .mensaje {
+            box-shadow: none;
+            border: none;
+            padding: 0;
+            margin-bottom: 12px;
+        }
+
+        .panel:last-child .vacio {
+            border: none;
+            background: transparent;
+            padding: 12px 0;
         }
 
         .mensaje {
@@ -197,59 +253,60 @@ $mensajes = listarMensajes();
             mensaje<?php echo count($mensajes) === 1 ? '' : 's'; ?> de contacto.
         </p>
 
-        <section class="paneles">
-            <article class="panel">
-                <h2>🗂️ Mesa de partes</h2>
-                <p>Centraliza los trámites, solicitudes y seguimiento del área administrativa.</p>
-                <ul>
-                    <li>Solicitudes registradas</li>
-                    <li>Trámites en revisión</li>
-                    <li>Atención prioritaria</li>
-                </ul>
-            </article>
+        <nav class="sidebar">
+            <section class="paneles">
+                <article class="panel">
+                    <h2>🗂️ Mesa de partes</h2>
+                    <p>Centraliza los trámites, solicitudes y seguimiento del área administrativa.</p>
+                    <ul>
+                        <li>Solicitudes registradas</li>
+                        <li>Trámites en revisión</li>
+                        <li>Atención prioritaria</li>
+                    </ul>
+                </article>
 
-            <article class="panel">
-                <h2>📚 Biblioteca</h2>
-                <p>Accede a recursos, guías y materiales de apoyo para docentes y estudiantes.</p>
-                <ul>
-                    <li>Guías de estudio</li>
-                    <li>Material digital</li>
-                    <li>Recursos recomendados</li>
-                </ul>
-            </article>
+                <article class="panel">
+                    <h2>📚 Biblioteca</h2>
+                    <p>Accede a recursos, guías y materiales de apoyo para docentes y estudiantes.</p>
+                    <ul>
+                        <li>Guías de estudio</li>
+                        <li>Material digital</li>
+                        <li>Recursos recomendados</li>
+                    </ul>
+                </article>
 
-            <article class="panel">
-                <h2>💬 Mensajes</h2>
-                <p>Revisa los mensajes recibidos desde la página principal del sitio.</p>
-                <ul>
-                    <li>Mensajes nuevos</li>
-                    <li>Respuestas pendientes</li>
-                    <li>Historial de contacto</li>
-                </ul>
+                <article class="panel">
+                    <h2>💬 Mensajes</h2>
+                    <p>Revisa los mensajes recibidos desde la página principal del sitio.</p>
+                    <ul>
+                        <li>Mensajes nuevos</li>
+                        <li>Respuestas pendientes</li>
+                        <li>Historial de contacto</li>
+                    </ul>
+                    <div class="contenido-mensajes">
+                        <?php if (count($mensajes) === 0): ?>
+                            <div class="vacio">Aún no has recibido mensajes. Cuando alguien use el formulario de contacto, aparecerá aquí.</div>
+                        <?php endif; ?>
 
-                <div style="margin-top: 14px;">
-                    <?php if (count($mensajes) === 0): ?>
-                        <div class="vacio">Aún no has recibido mensajes. Cuando alguien use el formulario de contacto, aparecerá aquí.</div>
-                    <?php endif; ?>
-
-                    <?php foreach ($mensajes as $fila): ?>
-                        <article class="mensaje">
-                            <div class="mensaje-cabecera">
-                                <h2><?php echo htmlspecialchars($fila['nombre']); ?></h2>
-                                <a href="mailto:<?php echo htmlspecialchars($fila['correo']); ?>">
-                                    <?php echo htmlspecialchars($fila['correo']); ?>
-                                </a>
-                                <span class="fecha"><?php echo date('d/m/Y H:i', strtotime($fila['fecha_envio'])); ?></span>
-                            </div>
-                            <p><?php echo nl2br(htmlspecialchars($fila['mensaje'])); ?></p>
-                            <form method="post" action="../controlador/eliminar.php" onsubmit="return confirm('¿Eliminar este mensaje?')">
-                                <button type="submit" name="eliminar" value="<?php echo $fila['id']; ?>">Eliminar</button>
-                            </form>
-                        </article>
-                    <?php endforeach; ?>
-                </div>
-            </article>
-        </section>
+                        <?php foreach ($mensajes as $fila): ?>
+                            <article class="mensaje">
+                                <div class="mensaje-cabecera">
+                                    <h2><?php echo htmlspecialchars($fila['nombre']); ?></h2>
+                                    <a href="mailto:<?php echo htmlspecialchars($fila['correo']); ?>">
+                                        <?php echo htmlspecialchars($fila['correo']); ?>
+                                    </a>
+                                    <span class="fecha"><?php echo date('d/m/Y H:i', strtotime($fila['fecha_envio'])); ?></span>
+                                </div>
+                                <p><?php echo nl2br(htmlspecialchars($fila['mensaje'])); ?></p>
+                                <form method="post" action="../controlador/eliminar.php" onsubmit="return confirm('¿Eliminar este mensaje?')">
+                                    <button type="submit" name="eliminar" value="<?php echo $fila['id']; ?>">Eliminar</button>
+                                </form>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                </article>
+            </section>
+        </nav>
 
     </main>
 </body>
