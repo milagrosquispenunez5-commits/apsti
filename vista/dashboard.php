@@ -1,6 +1,9 @@
 <?php
 // VISTA — Dashboard con menú lateral (sidebar) de 4 secciones.
 // Los datos vienen del modelo; los formularios envían al controlador.
+require_once __DIR__ . '/../modelo/auth.php';
+requerirRol('administrador');
+
 require_once __DIR__ . '/../modelo/mensaje.php';
 require_once __DIR__ . '/../modelo/tramite.php';
 require_once __DIR__ . '/../modelo/biblioteca.php';
@@ -9,15 +12,12 @@ $mensajes = listarMensajes();
 $tramites = listarTramites();
 $archivos = listarArchivosBiblioteca();
 
-$etiquetasEstado = [
-    'pendiente' => 'Pendiente',
-    'proceso'   => 'En proceso',
-    'atendido'  => 'Atendido',
-];
-
 $pendientes = count(array_filter($tramites, fn($t) => $t['estado'] === 'pendiente'));
 $enProceso  = count(array_filter($tramites, fn($t) => $t['estado'] === 'proceso'));
 $atendidos  = count(array_filter($tramites, fn($t) => $t['estado'] === 'atendido'));
+$rechazados = count(array_filter($tramites, fn($t) => $t['estado'] === 'rechazado'));
+
+$mensajesNoLeidos = count(array_filter($mensajes, fn($m) => (int) $m['leido'] === 0));
 
 function iconoArchivo($nombreArchivo)
 {
@@ -142,6 +142,8 @@ function iconoArchivo($nombreArchivo)
         .sidebar-pie {
             padding: 18px 22px 22px;
             border-top: 1px solid rgba(255, 255, 255, .15);
+            display: grid;
+            gap: 8px;
         }
 
         .sidebar-pie a {
@@ -242,6 +244,19 @@ function iconoArchivo($nombreArchivo)
             margin-bottom: 16px;
         }
 
+        .mensaje.no-leido {
+            border-left: 3px solid var(--color-brand);
+        }
+
+        .punto-no-leido {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-brand);
+            margin-right: 6px;
+        }
+
         .mensaje-cabecera {
             display: flex;
             justify-content: space-between;
@@ -269,7 +284,12 @@ function iconoArchivo($nombreArchivo)
 
         .mensaje p { font-size: .95rem; line-height: 1.6; }
 
-        .mensaje form { margin-top: 14px; text-align: right; }
+        .mensaje-acciones {
+            margin-top: 14px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
 
         .mensaje button {
             font-family: inherit;
@@ -381,6 +401,7 @@ function iconoArchivo($nombreArchivo)
         .badge-estado.pendiente { background: #fdecea; color: #b30000; }
         .badge-estado.proceso   { background: #fff4de; color: #8a5a00; }
         .badge-estado.atendido  { background: #e6f4ea; color: #1e7a34; }
+        .badge-estado.rechazado { background: #ececec; color: #5a5350; }
 
         .badge-origen {
             display: inline-block;
@@ -489,10 +510,22 @@ function iconoArchivo($nombreArchivo)
 
         .form-estado { display: inline-block; }
 
-        .form-estado select.badge-estado {
+        .form-estado select {
             font-family: inherit;
-            border: none;
+            font-size: .85rem;
             cursor: pointer;
+        }
+
+        .form-estado select.badge-estado {
+            border: none;
+        }
+
+        .form-estado select:not(.badge-estado) {
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            padding: 6px 10px;
+            background: var(--color-bg);
+            color: var(--color-ink);
         }
 
         /* ---------- Biblioteca ---------- */
@@ -599,8 +632,8 @@ function iconoArchivo($nombreArchivo)
                 </button></li>
                 <li><button type="button" data-seccion="mensajes">
                     <span class="icono">💬</span> Mensajes
-                    <?php if (count($mensajes) > 0): ?>
-                        <span style="margin-left:auto; background:#fff; color:var(--color-brand-deep); border-radius:999px; padding:1px 8px; font-size:.75rem; font-weight:600;"><?php echo count($mensajes); ?></span>
+                    <?php if ($mensajesNoLeidos > 0): ?>
+                        <span style="margin-left:auto; background:#fff; color:var(--color-brand-deep); border-radius:999px; padding:1px 8px; font-size:.75rem; font-weight:600;"><?php echo $mensajesNoLeidos; ?></span>
                     <?php endif; ?>
                 </button></li>
                 <li><button type="button" data-seccion="usuarios">
@@ -608,7 +641,8 @@ function iconoArchivo($nombreArchivo)
                 </button></li>
             </ul>
             <div class="sidebar-pie">
-                <a href="../ASPTI.html">← Volver al sitio</a>
+                <a href="../index.html">← Volver al sitio</a>
+                <a href="../controlador/logout.php">Cerrar sesión</a>
             </div>
         </aside>
 
@@ -641,6 +675,10 @@ function iconoArchivo($nombreArchivo)
                             <span class="numero"><?php echo $atendidos; ?></span>
                             <span class="etiqueta">Atendidos</span>
                         </div>
+                        <div class="stat">
+                            <span class="numero"><?php echo $rechazados; ?></span>
+                            <span class="etiqueta">Rechazados</span>
+                        </div>
                     </div>
 
                     <article class="panel">
@@ -654,27 +692,24 @@ function iconoArchivo($nombreArchivo)
                                 Tipo de trámite
                                 <select name="tipo_tramite" required>
                                     <option value="">Selecciona un tipo</option>
-                                    <option>Constancia de matrícula</option>
-                                    <option>Constancia de notas</option>
-                                    <option>Certificado de estudios</option>
-                                    <option>Duplicado de carné</option>
-                                    <option>Traslado interno</option>
-                                    <option>Retiro / reserva de matrícula</option>
-                                    <option>Solicitud de práctica pre-profesional</option>
-                                    <option>Convalidación de cursos</option>
-                                    <option>Otro</option>
+                                    <?php foreach (TIPOS_TRAMITE_PERMITIDOS as $tipo): ?>
+                                        <option><?php echo htmlspecialchars($tipo); ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                             </label>
                             <label>
                                 Área destino
                                 <select name="area_destino" required>
                                     <option value="">Selecciona un área</option>
-                                    <option>Secretaría académica</option>
-                                    <option>Coordinación académica</option>
-                                    <option>Bienestar estudiantil</option>
-                                    <option>Tesorería</option>
-                                    <option>Dirección general</option>
+                                    <?php foreach (AREAS_DESTINO_PERMITIDAS as $area): ?>
+                                        <?php if ($area === 'Por asignar') continue; ?>
+                                        <option><?php echo htmlspecialchars($area); ?></option>
+                                    <?php endforeach; ?>
                                 </select>
+                            </label>
+                            <label class="campo-ancho">
+                                Detalle (obligatorio si el tipo es "Otro")
+                                <input type="text" name="detalle" placeholder="Detalle adicional (opcional)">
                             </label>
                             <button type="submit" class="btn-primario">Registrar trámite</button>
                         </form>
@@ -713,14 +748,28 @@ function iconoArchivo($nombreArchivo)
                                                     <?php endif; ?>
                                                 </td>
                                                 <td><span class="badge-origen <?php echo $t['origen']; ?>"><?php echo $t['origen'] === 'publico' ? 'Público' : 'Interno'; ?></span></td>
-                                                <td><?php echo htmlspecialchars($t['tipo_tramite']); ?></td>
-                                                <td><?php echo htmlspecialchars($t['area_destino']); ?></td>
+                                                <td>
+                                                    <?php echo htmlspecialchars($t['tipo_tramite']); ?>
+                                                    <?php if (!empty($t['detalle'])): ?>
+                                                        <br><small class="contacto-tramite"><?php echo htmlspecialchars($t['detalle']); ?></small>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td>
+                                                    <form method="post" action="../controlador/actualizar_area_tramite.php" class="form-estado">
+                                                        <input type="hidden" name="id" value="<?php echo $t['id']; ?>">
+                                                        <select name="area_destino" onchange="this.form.submit()">
+                                                            <?php foreach (AREAS_DESTINO_PERMITIDAS as $area): ?>
+                                                                <option value="<?php echo htmlspecialchars($area); ?>" <?php echo $area === $t['area_destino'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($area); ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </form>
+                                                </td>
                                                 <td><?php echo date('d/m/Y', strtotime($t['fecha_registro'])); ?></td>
                                                 <td>
                                                     <form method="post" action="../controlador/actualizar_estado_tramite.php" class="form-estado">
                                                         <input type="hidden" name="id" value="<?php echo $t['id']; ?>">
                                                         <select name="estado" class="badge-estado <?php echo $t['estado']; ?>" onchange="this.form.submit()">
-                                                            <?php foreach ($etiquetasEstado as $valor => $etiqueta): ?>
+                                                            <?php foreach (ESTADOS_TRAMITE_PERMITIDOS as $valor => $etiqueta): ?>
                                                                 <option value="<?php echo $valor; ?>" <?php echo $valor === $t['estado'] ? 'selected' : ''; ?>><?php echo $etiqueta; ?></option>
                                                             <?php endforeach; ?>
                                                         </select>
@@ -833,7 +882,8 @@ function iconoArchivo($nombreArchivo)
                 <section class="seccion" id="mensajes">
                     <p class="resumen">
                         Tienes <strong><?php echo count($mensajes); ?></strong>
-                        mensaje<?php echo count($mensajes) === 1 ? '' : 's'; ?> de contacto.
+                        mensaje<?php echo count($mensajes) === 1 ? '' : 's'; ?> de contacto
+                        (<strong><?php echo $mensajesNoLeidos; ?></strong> sin leer).
                     </p>
 
                     <?php if (count($mensajes) === 0): ?>
@@ -841,18 +891,31 @@ function iconoArchivo($nombreArchivo)
                     <?php endif; ?>
 
                     <?php foreach ($mensajes as $fila): ?>
-                        <article class="mensaje">
+                        <article class="mensaje <?php echo (int) $fila['leido'] === 0 ? 'no-leido' : ''; ?>">
                             <div class="mensaje-cabecera">
-                                <h2><?php echo htmlspecialchars($fila['nombre']); ?></h2>
+                                <h2>
+                                    <?php if ((int) $fila['leido'] === 0): ?>
+                                        <span class="punto-no-leido" title="No leído"></span>
+                                    <?php endif; ?>
+                                    <?php echo htmlspecialchars($fila['nombre']); ?>
+                                </h2>
                                 <a href="mailto:<?php echo htmlspecialchars($fila['correo']); ?>">
                                     <?php echo htmlspecialchars($fila['correo']); ?>
                                 </a>
                                 <span class="fecha"><?php echo date('d/m/Y H:i', strtotime($fila['fecha_envio'])); ?></span>
                             </div>
                             <p><?php echo nl2br(htmlspecialchars($fila['mensaje'])); ?></p>
-                            <form method="post" action="../controlador/eliminar.php" onsubmit="return confirm('¿Eliminar este mensaje?')">
-                                <button type="submit" name="eliminar" value="<?php echo $fila['id']; ?>">Eliminar</button>
-                            </form>
+                            <div class="mensaje-acciones">
+                                <?php if ((int) $fila['leido'] === 0): ?>
+                                    <form method="post" action="../controlador/marcar_leido_mensaje.php">
+                                        <input type="hidden" name="id" value="<?php echo $fila['id']; ?>">
+                                        <button type="submit" class="btn-ver">Marcar como leído</button>
+                                    </form>
+                                <?php endif; ?>
+                                <form method="post" action="../controlador/eliminar.php" onsubmit="return confirm('¿Eliminar este mensaje?')">
+                                    <button type="submit" name="eliminar" value="<?php echo $fila['id']; ?>">Eliminar</button>
+                                </form>
+                            </div>
                         </article>
                     <?php endforeach; ?>
                 </section>

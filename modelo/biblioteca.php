@@ -3,6 +3,8 @@
 // El archivo se guarda dentro de la base de datos (columna LONGBLOB).
 require_once __DIR__ . '/conexion.php';
 
+const CATEGORIAS_BIBLIOTECA_PERMITIDAS = ['Guía de estudio', 'Material digital', 'Recurso recomendado'];
+
 // Guarda un archivo y devuelve su id (o false si falló)
 function guardarArchivoBiblioteca($titulo, $descripcion, $categoria, $nombreArchivo, $tipoMime, $tamanoBytes, $contenido)
 {

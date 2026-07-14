@@ -1,6 +1,8 @@
 <?php
-// CONTROLADOR — Recibe el formulario público de mesa de partes (con documento opcional) y lo guarda.
+// CONTROLADOR — Recibe el formulario de mesa de partes de un cliente autenticado y lo guarda.
+require_once __DIR__ . '/../modelo/auth.php';
 require_once __DIR__ . '/../modelo/tramite.php';
+require_once __DIR__ . '/../modelo/validacion_archivos.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -12,20 +14,25 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$solicitante = trim($_POST['solicitante'] ?? '');
-$correo      = trim($_POST['correo'] ?? '');
-$telefono    = trim($_POST['telefono'] ?? '');
-$tipoTramite = trim($_POST['tipo_tramite'] ?? '');
-
-if ($solicitante === '' || $correo === '' || $tipoTramite === '') {
-    http_response_code(400);
-    echo json_encode(['error' => 'Faltan datos: nombre, correo y tipo de trámite son obligatorios.']);
+if (!estaAutenticado() || rolActual() !== 'cliente') {
+    http_response_code(401);
+    echo json_encode(['error' => 'Debes iniciar sesión como cliente para enviar un trámite.']);
     exit;
 }
 
-if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+$usuario = obtenerUsuarioPorId(idUsuarioActual());
+if (!$usuario) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Tu sesión ya no es válida. Inicia sesión de nuevo.']);
+    exit;
+}
+
+$tipoTramite = trim($_POST['tipo_tramite'] ?? '');
+$detalle     = trim($_POST['detalle'] ?? '');
+
+if (!in_array($tipoTramite, TIPOS_TRAMITE_PERMITIDOS, true)) {
     http_response_code(400);
-    echo json_encode(['error' => 'El correo ingresado no es válido.']);
+    echo json_encode(['error' => 'El tipo de trámite seleccionado no es válido.']);
     exit;
 }
 
@@ -43,13 +50,30 @@ if (isset($_FILES['documento']) && $_FILES['documento']['error'] !== UPLOAD_ERR_
         exit;
     }
 
+    $documentoMime = validarArchivoSubido($documento['name'], $documento['tmp_name']);
+    if ($documentoMime === null) {
+        http_response_code(400);
+        echo json_encode(['error' => 'El tipo de documento no está permitido.']);
+        exit;
+    }
+
     $documentoNombre = $documento['name'];
-    $documentoMime = $documento['type'] ?: 'application/octet-stream';
     $documentoTamano = $documento['size'];
     $documentoContenido = file_get_contents($documento['tmp_name']);
 }
 
-$id = guardarTramitePublico($solicitante, $correo, $telefono, $tipoTramite, $documentoNombre, $documentoMime, $documentoTamano, $documentoContenido);
+$id = guardarTramitePublico(
+    $usuario['id'],
+    $usuario['nombre'],
+    $usuario['correo'],
+    $usuario['telefono'],
+    $tipoTramite,
+    $detalle,
+    $documentoNombre,
+    $documentoMime,
+    $documentoTamano,
+    $documentoContenido
+);
 
 if ($id !== false) {
     $codigo = 'MP-' . date('Y') . '-' . str_pad($id, 4, '0', STR_PAD_LEFT);

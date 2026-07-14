@@ -28,3 +28,12 @@ function eliminarMensaje($id)
     $sql->bind_param('i', $id);
     return $sql->execute();
 }
+
+// Marca un mensaje como leído
+function marcarMensajeLeido($id)
+{
+    global $conexion;
+    $sql = $conexion->prepare('UPDATE mensajes SET leido = 1 WHERE id = ?');
+    $sql->bind_param('i', $id);
+    return $sql->execute();
+}

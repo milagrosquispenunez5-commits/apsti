@@ -32,7 +32,7 @@
                 </h1>
             </div>
 
-            <div class="header-acciones">
+            <div class="header-acciones" id="accionesHeader">
                 <button onclick="abrirLogin()" class="btn-iniciar-sesion" type="button" aria-label="Iniciar sesión">
                     <i class="fa-solid fa-sign-in-alt"></i> Iniciar sesión
                 </button>
@@ -52,14 +52,8 @@
                 <li><a href="#beneficios">Beneficios</a></li>
                 <li><a href="#docentes">Docentes</a></li>
                 <li><a href="#galeria">Galeria</a></li>
-                <li><a href="#tramites">Mesa de Partes</a></li>
+                <li><a href="javascript:void(0);" onclick="abrirTramites()" role="button">Mesa de Partes</a></li>
                 <li><a href="#contacto">Contacto</a></li>
-
-                <li>
-                    <a href="javascript:void(0);" id="abrirMesaPartes" role="button">
-                       <i class="fa-solid fa-user-lock"></i> Panel Administrativo
-                    </a>
-               </li>
 
             </ul>
 
@@ -519,45 +513,62 @@
         </div>
 
     </section>
-    <section id="tramites">
+    <div id="tramitesModal" class="tramites-modal" role="dialog" aria-modal="true" aria-labelledby="tramitesTitle">
+        <div class="tramites-panel">
+            <button class="cerrar" onclick="cerrarTramites()" type="button" aria-label="Cerrar mesa de partes">&times;</button>
 
-        <h2>Mesa de Partes</h2>
-        <p class="tramites-intro">Registra tu solicitud (constancias, certificados, traslados y más) y adjunta el documento que la sustente. Te contactaremos al correo o teléfono que nos dejes.</p>
+            <div class="tramites-header">
+                <div>
+                    <p class="tramites-etiqueta">Trámite documentario</p>
+                    <h3 id="tramitesTitle">Mesa de Partes</h3>
+                </div>
+            </div>
 
-        <form id="form-tramite" enctype="multipart/form-data">
+            <div id="tramitesSinSesion" class="tramites-gate">
+                <p class="tramites-intro">Para registrar un trámite y poder darle seguimiento después, primero inicia sesión o crea una cuenta.</p>
+                <div class="tramites-gate-botones">
+                    <button type="button" onclick="cerrarTramites(); abrirLogin();">Iniciar sesión</button>
+                    <button type="button" class="secundario" onclick="cerrarTramites(); abrirRegistro();">Crear cuenta</button>
+                </div>
+            </div>
 
-            <input type="text" name="solicitante" placeholder="Nombre completo" required maxlength="150">
+            <div id="tramitesConSesion" style="display:none;">
+                <p class="tramites-intro">Registra tu solicitud (constancias, certificados, traslados y más) y adjunta el documento que la sustente. El personal de Mesa de Partes revisará tu solicitud y se comunicará contigo.</p>
 
-            <input type="email" name="correo" placeholder="Correo" required maxlength="150">
+                <form id="form-tramite" enctype="multipart/form-data">
 
-            <input type="tel" name="telefono" placeholder="Teléfono (opcional)" maxlength="30">
+                    <select name="tipo_tramite" id="tipoTramite" required>
+                        <option value="">Selecciona el tipo de trámite</option>
+                        <option>Constancia de matrícula</option>
+                        <option>Constancia de notas</option>
+                        <option>Certificado de estudios</option>
+                        <option>Duplicado de carné</option>
+                        <option>Traslado interno</option>
+                        <option>Retiro / reserva de matrícula</option>
+                        <option>Solicitud de práctica pre-profesional</option>
+                        <option>Convalidación de cursos</option>
+                        <option>Otro</option>
+                    </select>
 
-            <select name="tipo_tramite" required>
-                <option value="">Selecciona el tipo de trámite</option>
-                <option>Constancia de matrícula</option>
-                <option>Constancia de notas</option>
-                <option>Certificado de estudios</option>
-                <option>Duplicado de carné</option>
-                <option>Traslado interno</option>
-                <option>Retiro / reserva de matrícula</option>
-                <option>Solicitud de práctica pre-profesional</option>
-                <option>Convalidación de cursos</option>
-                <option>Otro</option>
-            </select>
+                    <textarea name="detalle" id="detalleTramite" placeholder="Cuéntanos más sobre tu solicitud (obligatorio si elegiste &quot;Otro&quot;)"></textarea>
 
-            <label class="campo-archivo">
-                Documento adjunto (opcional, máx. 15 MB)
-                <input type="file" name="documento">
-            </label>
+                    <label class="campo-archivo">
+                        Documento adjunto (opcional, máx. 15 MB)
+                        <input type="file" name="documento">
+                    </label>
 
-            <button type="submit">
-                Enviar solicitud
-            </button>
+                    <button type="submit">
+                        Enviar solicitud
+                    </button>
 
-            <p id="estado-tramite" role="status"></p>
+                    <p id="estado-tramite" role="status"></p>
 
-        </form>
-    </section>
+                </form>
+
+                <p class="login-alterno"><a href="vista/mis_tramites.php">Ver mis trámites →</a></p>
+            </div>
+        </div>
+    </div>
 
     <section id="contacto">
 
@@ -583,12 +594,28 @@
     <div id="loginModal" class="login-modal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
         <div class="login-box">
             <span class="cerrar" onclick="cerrarLogin()" aria-label="Cerrar login">&times;</span>
-            <h2 id="loginTitle"><i class="fa-solid fa-user-lock"></i> Acceso de administrador</h2>
-            <p class="login-subtitulo">Ingresa tus credenciales para entrar al panel.</p>
-            <input type="text" id="usuario" placeholder="Usuario">
-            <input type="password" id="clave" placeholder="Contraseña">
+            <h2 id="loginTitle"><i class="fa-solid fa-user-lock"></i> Iniciar sesión</h2>
+            <p class="login-subtitulo">Ingresa con tu correo y contraseña.</p>
+            <input type="email" id="correoLogin" placeholder="Correo">
+            <input type="password" id="claveLogin" placeholder="Contraseña">
             <button onclick="validarLogin()">Ingresar</button>
             <p id="mensajeLogin" class="mensaje-login"></p>
+            <p class="login-alterno">¿No tienes cuenta? <a href="javascript:void(0);" onclick="cerrarLogin(); abrirRegistro();">Regístrate</a></p>
+        </div>
+    </div>
+
+    <div id="registroModal" class="login-modal" role="dialog" aria-modal="true" aria-labelledby="registroTitle">
+        <div class="login-box">
+            <span class="cerrar" onclick="cerrarRegistro()" aria-label="Cerrar registro">&times;</span>
+            <h2 id="registroTitle"><i class="fa-solid fa-user-plus"></i> Crear cuenta</h2>
+            <p class="login-subtitulo">Regístrate para enviar y hacer seguimiento de tus trámites.</p>
+            <input type="text" id="nombreRegistro" placeholder="Nombre completo">
+            <input type="email" id="correoRegistro" placeholder="Correo">
+            <input type="tel" id="telefonoRegistro" placeholder="Teléfono (opcional)">
+            <input type="password" id="claveRegistro" placeholder="Contraseña (mín. 6 caracteres)">
+            <button onclick="validarRegistro()">Crear cuenta</button>
+            <p id="mensajeRegistro" class="mensaje-login"></p>
+            <p class="login-alterno">¿Ya tienes cuenta? <a href="javascript:void(0);" onclick="cerrarRegistro(); abrirLogin();">Inicia sesión</a></p>
         </div>
     </div>
 
@@ -660,6 +687,14 @@
 
         const formularioTramite = document.getElementById('form-tramite');
         const estadoTramite = document.getElementById('estado-tramite');
+        const tipoTramiteSelect = document.getElementById('tipoTramite');
+        const detalleTramite = document.getElementById('detalleTramite');
+
+        if (tipoTramiteSelect && detalleTramite) {
+            tipoTramiteSelect.addEventListener('change', () => {
+                detalleTramite.required = tipoTramiteSelect.value === 'Otro';
+            });
+        }
 
         if (formularioTramite) {
             formularioTramite.addEventListener('submit', async (evento) => {
@@ -672,7 +707,7 @@
                     });
                     const cuerpo = await respuesta.json();
                     if (respuesta.ok) {
-                        estadoTramite.textContent = `Trámite registrado ✓ Tu código es ${cuerpo.codigo}. Te contactaremos pronto.`;
+                        estadoTramite.textContent = `Trámite registrado ✓ Tu código es ${cuerpo.codigo}. Guárdalo para hacer seguimiento; el personal se comunicará contigo pronto.`;
                         formularioTramite.reset();
                     } else {
                         estadoTramite.textContent = cuerpo.error ?? 'No se pudo registrar el trámite.';
@@ -683,14 +718,9 @@
             });
         }
 
-        document.getElementById('abrirMesaPartes').addEventListener('click', function (evento) {
-            evento.preventDefault();
-            abrirLogin();
-        });
-
         function abrirLogin() {
             document.getElementById('loginModal').style.display = 'flex';
-            document.getElementById('usuario').focus();
+            document.getElementById('correoLogin').focus();
         }
 
         function cerrarLogin() {
@@ -698,20 +728,112 @@
             document.getElementById('mensajeLogin').textContent = '';
         }
 
-        function validarLogin() {
-            const usuario = document.getElementById('usuario').value.trim();
-            const clave = document.getElementById('clave').value.trim();
+        function abrirRegistro() {
+            document.getElementById('registroModal').style.display = 'flex';
+            document.getElementById('nombreRegistro').focus();
+        }
+
+        function cerrarRegistro() {
+            document.getElementById('registroModal').style.display = 'none';
+            document.getElementById('mensajeRegistro').textContent = '';
+        }
+
+        async function validarLogin() {
+            const correo = document.getElementById('correoLogin').value.trim();
+            const clave = document.getElementById('claveLogin').value.trim();
             const mensaje = document.getElementById('mensajeLogin');
 
-            if (usuario === 'admin' && clave === '123456') {
-                mensaje.textContent = 'Acceso correcto. Abriendo panel...';
-                mensaje.style.color = '#0f766e';
-                cerrarLogin();
-                window.location.href = 'vista/dashboard.php';
-            } else {
-                mensaje.textContent = 'Usuario o contraseña incorrectos';
+            mensaje.textContent = 'Verificando…';
+            mensaje.style.color = '';
+
+            try {
+                const respuesta = await fetch('controlador/login.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({ correo, clave }),
+                });
+                const cuerpo = await respuesta.json();
+
+                if (respuesta.ok) {
+                    mensaje.textContent = 'Acceso correcto...';
+                    mensaje.style.color = '#0f766e';
+                    if (cuerpo.rol === 'administrador') {
+                        window.location.href = 'vista/dashboard.php';
+                    } else {
+                        cerrarLogin();
+                        await actualizarEstadoSesion();
+                    }
+                } else {
+                    mensaje.textContent = cuerpo.error ?? 'Correo o contraseña incorrectos';
+                    mensaje.style.color = '#b30000';
+                }
+            } catch {
+                mensaje.textContent = 'Error de conexión con el servidor.';
                 mensaje.style.color = '#b30000';
             }
+        }
+
+        async function validarRegistro() {
+            const nombre = document.getElementById('nombreRegistro').value.trim();
+            const correo = document.getElementById('correoRegistro').value.trim();
+            const telefono = document.getElementById('telefonoRegistro').value.trim();
+            const clave = document.getElementById('claveRegistro').value;
+            const mensaje = document.getElementById('mensajeRegistro');
+
+            mensaje.textContent = 'Creando cuenta…';
+            mensaje.style.color = '';
+
+            try {
+                const respuesta = await fetch('controlador/registro.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({ nombre, correo, telefono, clave }),
+                });
+                const cuerpo = await respuesta.json();
+
+                if (respuesta.ok) {
+                    mensaje.textContent = 'Cuenta creada ✓ Ya puedes iniciar sesión.';
+                    mensaje.style.color = '#0f766e';
+                    setTimeout(() => { cerrarRegistro(); abrirLogin(); }, 1200);
+                } else {
+                    mensaje.textContent = cuerpo.error ?? 'No se pudo crear la cuenta.';
+                    mensaje.style.color = '#b30000';
+                }
+            } catch {
+                mensaje.textContent = 'Error de conexión con el servidor.';
+                mensaje.style.color = '#b30000';
+            }
+        }
+
+        async function actualizarEstadoSesion() {
+            const acciones = document.getElementById('accionesHeader');
+            let sesion = { autenticado: false };
+            try {
+                const respuesta = await fetch('controlador/sesion_actual.php');
+                sesion = await respuesta.json();
+            } catch {
+                sesion = { autenticado: false };
+            }
+
+            if (sesion.autenticado) {
+                const panel = sesion.rol === 'administrador' ? 'vista/dashboard.php' : 'vista/mis_tramites.php';
+                const etiquetaPanel = sesion.rol === 'administrador' ? 'Panel administrativo' : 'Mis trámites';
+                acciones.innerHTML = `
+                    <span class="saludo-sesion">Hola, ${escaparHtml(sesion.nombre)}</span>
+                    <a href="${panel}" class="btn-iniciar-sesion">${etiquetaPanel}</a>
+                    <a href="controlador/logout.php" class="btn-iniciar-sesion">Cerrar sesión</a>
+                `;
+            } else {
+                acciones.innerHTML = `
+                    <button onclick="abrirLogin()" class="btn-iniciar-sesion" type="button" aria-label="Iniciar sesión">
+                        <i class="fa-solid fa-sign-in-alt"></i> Iniciar sesión
+                    </button>
+                `;
+            }
+
+            const gateSinSesion = document.getElementById('tramitesSinSesion');
+            const gateConSesion = document.getElementById('tramitesConSesion');
+            const esCliente = sesion.autenticado && sesion.rol === 'cliente';
+            gateSinSesion.style.display = esCliente ? 'none' : 'block';
+            gateConSesion.style.display = esCliente ? 'block' : 'none';
         }
 
         let recursosBiblioteca = [];
@@ -784,11 +906,35 @@
             }
         });
 
+        document.getElementById('registroModal').addEventListener('click', (evento) => {
+            if (evento.target.id === 'registroModal') {
+                cerrarRegistro();
+            }
+        });
+
         document.getElementById('bibliotecaModal').addEventListener('click', (evento) => {
             if (evento.target.id === 'bibliotecaModal') {
                 cerrarBiblioteca();
             }
         });
+
+        function abrirTramites() {
+            document.getElementById('tramitesModal').style.display = 'flex';
+            const campoActivo = document.getElementById('tipoTramite');
+            if (campoActivo) campoActivo.focus();
+        }
+
+        function cerrarTramites() {
+            document.getElementById('tramitesModal').style.display = 'none';
+        }
+
+        document.getElementById('tramitesModal').addEventListener('click', (evento) => {
+            if (evento.target.id === 'tramitesModal') {
+                cerrarTramites();
+            }
+        });
+
+        actualizarEstadoSesion();
     </script>
 
 </body>

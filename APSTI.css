@@ -38,7 +38,7 @@
        (para que los enlaces del menú, en <nav>, puedan usarlos) */
     timeline-scope:
         --tl-inicio, --tl-nosotros, --tl-unidades, --tl-modulos,
-        --tl-malla, --tl-beneficios, --tl-docentes, --tl-galeria, --tl-tramites, --tl-contacto;
+        --tl-malla, --tl-beneficios, --tl-docentes, --tl-galeria, --tl-contacto;
 }
 
 *{
@@ -167,6 +167,16 @@ header{
     right:50px;
     top:50%;
     transform:translateY(-50%);
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.saludo-sesion{
+    color:#fff;
+    font-size:14px;
+    font-weight:600;
+    opacity:.9;
 }
 
 .btn-iniciar-sesion{
@@ -236,7 +246,6 @@ header{
 #beneficios{ view-timeline-name:--tl-beneficios; }
 #docentes{ view-timeline-name:--tl-docentes; }
 #galeria{ view-timeline-name:--tl-galeria; }
-#tramites{ view-timeline-name:--tl-tramites; }
 #contacto{ view-timeline-name:--tl-contacto; }
 
 @keyframes resaltarLink{
@@ -258,7 +267,6 @@ header{
 .menu ul li a[href="#beneficios"]{ animation:resaltarLink linear both; animation-timeline:--tl-beneficios; animation-range:cover 0% cover 100%; }
 .menu ul li a[href="#docentes"]{ animation:resaltarLink linear both; animation-timeline:--tl-docentes; animation-range:cover 0% cover 100%; }
 .menu ul li a[href="#galeria"]{ animation:resaltarLink linear both; animation-timeline:--tl-galeria; animation-range:cover 0% cover 100%; }
-.menu ul li a[href="#tramites"]{ animation:resaltarLink linear both; animation-timeline:--tl-tramites; animation-range:cover 0% cover 100%; }
 .menu ul li a[href="#contacto"]{ animation:resaltarLink linear both; animation-timeline:--tl-contacto; animation-range:cover 0% cover 100%; }
 
 @media (prefers-reduced-motion: reduce){
@@ -913,15 +921,47 @@ section h2{
     }
 }
 
-#tramites{
-    background:var(--color-bg);
+.tramites-intro{
+    color:var(--color-body);
+    margin-bottom:var(--space-3);
 }
 
-#tramites .tramites-intro{
-    max-width:640px;
-    margin:0 auto var(--space-3);
+.tramites-gate{
     text-align:center;
-    color:var(--color-body);
+    padding:10px 0 4px;
+}
+
+.tramites-gate-botones{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+.tramites-gate-botones button{
+    border:none;
+    cursor:pointer;
+    padding:12px 20px;
+    border-radius:999px;
+    font-weight:600;
+    font-size:.95rem;
+    background:var(--color-brand);
+    color:#fff;
+}
+
+.tramites-gate-botones button:hover{
+    background:var(--color-brand-deep);
+}
+
+.tramites-gate-botones button.secundario{
+    background:transparent;
+    color:var(--color-brand);
+    border:1px solid var(--color-brand);
+}
+
+.tramites-gate-botones button.secundario:hover{
+    background:var(--color-brand);
+    color:#fff;
 }
 
 #contacto{
@@ -938,8 +978,13 @@ form{
     border:1px solid var(--color-border);
 }
 
-#tramites form{
-    background:var(--color-surface);
+.tramites-panel form{
+    width:100%;
+    margin:0;
+    padding:0;
+    background:transparent;
+    border:none;
+    box-shadow:none;
 }
 
 form input,
@@ -1115,7 +1160,8 @@ footer p{
 }
 
 .login-modal,
-.biblioteca-modal{
+.biblioteca-modal,
+.tramites-modal{
     display:none;
     position:fixed;
     inset:0;
@@ -1127,7 +1173,8 @@ footer p{
 }
 
 .login-box,
-.biblioteca-panel{
+.biblioteca-panel,
+.tramites-panel{
     width:min(100%, 420px);
     background:var(--color-surface);
     padding:24px;
@@ -1137,13 +1184,15 @@ footer p{
 }
 
 .login-box h2,
-.biblioteca-header h3{
+.biblioteca-header h3,
+.tramites-header h3{
     color:var(--color-brand-deep);
     margin-bottom:8px;
 }
 
 .login-subtitulo,
-.biblioteca-etiqueta{
+.biblioteca-etiqueta,
+.tramites-etiqueta{
     color:#706967;
     font-size:.92rem;
     margin-bottom:16px;
@@ -1160,6 +1209,7 @@ footer p{
 }
 
 .login-box button,
+.cerrar,
 .biblioteca-cerrar,
 .fab-biblioteca{
     border:none;
@@ -1196,6 +1246,23 @@ footer p{
     font-size:.95rem;
 }
 
+.login-alterno{
+    margin-top:14px;
+    font-size:.88rem;
+    color:#706967;
+    text-align:center;
+}
+
+.login-alterno a{
+    color:var(--color-brand);
+    font-weight:600;
+    text-decoration:none;
+}
+
+.login-alterno a:hover{
+    text-decoration:underline;
+}
+
 .fab-biblioteca{
     position:fixed;
     right:24px;
@@ -1222,11 +1289,18 @@ footer p{
     overflow:auto;
 }
 
-.biblioteca-header{
+.biblioteca-header,
+.tramites-header{
     display:flex;
     justify-content:space-between;
     align-items:flex-start;
     margin-bottom:12px;
+}
+
+.tramites-panel{
+    width:min(100%, 560px);
+    max-height:80vh;
+    overflow:auto;
 }
 
 .biblioteca-buscar{
