@@ -42,7 +42,7 @@ $mensajes = listarMensajes();
             padding: 24px 20px;
         }
 
-        .contenedor { max-width: 900px; margin: 0 auto; }
+        .contenedor { max-width: 1100px; margin: 0 auto; }
 
         header .contenedor {
             display: flex;
@@ -73,6 +73,48 @@ $mensajes = listarMensajes();
         }
 
         .resumen strong { color: var(--color-brand); font-size: 1.1rem; }
+
+        .paneles {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .panel {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            padding: 20px;
+        }
+
+        .panel h2 {
+            font-size: 1.05rem;
+            color: var(--color-brand-deep);
+            margin-bottom: 10px;
+        }
+
+        .panel p {
+            font-size: .95rem;
+            line-height: 1.6;
+            color: var(--color-body);
+        }
+
+        .panel ul {
+            list-style: none;
+            display: grid;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .panel li {
+            background: var(--color-bg);
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: .9rem;
+            color: var(--color-ink);
+        }
 
         .mensaje {
             background: var(--color-surface);
@@ -155,25 +197,59 @@ $mensajes = listarMensajes();
             mensaje<?php echo count($mensajes) === 1 ? '' : 's'; ?> de contacto.
         </p>
 
-        <?php if (count($mensajes) === 0): ?>
-            <div class="vacio">Aún no has recibido mensajes. Cuando alguien use el formulario de contacto, aparecerá aquí.</div>
-        <?php endif; ?>
-
-        <?php foreach ($mensajes as $fila): ?>
-            <article class="mensaje">
-                <div class="mensaje-cabecera">
-                    <h2><?php echo htmlspecialchars($fila['nombre']); ?></h2>
-                    <a href="mailto:<?php echo htmlspecialchars($fila['correo']); ?>">
-                        <?php echo htmlspecialchars($fila['correo']); ?>
-                    </a>
-                    <span class="fecha"><?php echo date('d/m/Y H:i', strtotime($fila['fecha_envio'])); ?></span>
-                </div>
-                <p><?php echo nl2br(htmlspecialchars($fila['mensaje'])); ?></p>
-                <form method="post" action="../controlador/eliminar.php" onsubmit="return confirm('¿Eliminar este mensaje?')">
-                    <button type="submit" name="eliminar" value="<?php echo $fila['id']; ?>">Eliminar</button>
-                </form>
+        <section class="paneles">
+            <article class="panel">
+                <h2>🗂️ Mesa de partes</h2>
+                <p>Centraliza los trámites, solicitudes y seguimiento del área administrativa.</p>
+                <ul>
+                    <li>Solicitudes registradas</li>
+                    <li>Trámites en revisión</li>
+                    <li>Atención prioritaria</li>
+                </ul>
             </article>
-        <?php endforeach; ?>
+
+            <article class="panel">
+                <h2>📚 Biblioteca</h2>
+                <p>Accede a recursos, guías y materiales de apoyo para docentes y estudiantes.</p>
+                <ul>
+                    <li>Guías de estudio</li>
+                    <li>Material digital</li>
+                    <li>Recursos recomendados</li>
+                </ul>
+            </article>
+
+            <article class="panel">
+                <h2>💬 Mensajes</h2>
+                <p>Revisa los mensajes recibidos desde la página principal del sitio.</p>
+                <ul>
+                    <li>Mensajes nuevos</li>
+                    <li>Respuestas pendientes</li>
+                    <li>Historial de contacto</li>
+                </ul>
+
+                <div style="margin-top: 14px;">
+                    <?php if (count($mensajes) === 0): ?>
+                        <div class="vacio">Aún no has recibido mensajes. Cuando alguien use el formulario de contacto, aparecerá aquí.</div>
+                    <?php endif; ?>
+
+                    <?php foreach ($mensajes as $fila): ?>
+                        <article class="mensaje">
+                            <div class="mensaje-cabecera">
+                                <h2><?php echo htmlspecialchars($fila['nombre']); ?></h2>
+                                <a href="mailto:<?php echo htmlspecialchars($fila['correo']); ?>">
+                                    <?php echo htmlspecialchars($fila['correo']); ?>
+                                </a>
+                                <span class="fecha"><?php echo date('d/m/Y H:i', strtotime($fila['fecha_envio'])); ?></span>
+                            </div>
+                            <p><?php echo nl2br(htmlspecialchars($fila['mensaje'])); ?></p>
+                            <form method="post" action="../controlador/eliminar.php" onsubmit="return confirm('¿Eliminar este mensaje?')">
+                                <button type="submit" name="eliminar" value="<?php echo $fila['id']; ?>">Eliminar</button>
+                            </form>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            </article>
+        </section>
 
     </main>
 </body>

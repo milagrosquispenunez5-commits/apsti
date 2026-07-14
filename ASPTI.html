@@ -48,6 +48,12 @@
                 <li><a href="#galeria">Galeria</a></li>
                 <li><a href="#contacto">Contacto</a></li>
 
+                <li>
+                    <a href="javascript:void(0);" id="abrirMesaPartes" role="button">
+                       <i class="fa-solid fa-user-lock"></i> Mesa de Partes
+                    </a>
+               </li>
+
             </ul>
 
         </nav>
@@ -525,8 +531,44 @@
             <p id="estado-envio" role="status"></p>
 
         </form>
-
     </section>
+
+    <div id="loginModal" class="login-modal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+        <div class="login-box">
+            <span class="cerrar" onclick="cerrarLogin()" aria-label="Cerrar login">&times;</span>
+            <h2 id="loginTitle"><i class="fa-solid fa-user-lock"></i> Acceso de administrador</h2>
+            <p class="login-subtitulo">Ingresa tus credenciales para entrar al panel.</p>
+            <input type="text" id="usuario" placeholder="Usuario">
+            <input type="password" id="clave" placeholder="Contraseña">
+            <button onclick="validarLogin()">Ingresar</button>
+            <p id="mensajeLogin" class="mensaje-login"></p>
+        </div>
+    </div>
+
+    <button class="fab-biblioteca" onclick="abrirBiblioteca()" type="button">
+        <i class="fa-solid fa-book-open"></i>
+        <span>Biblioteca</span>
+    </button>
+
+    <div id="bibliotecaModal" class="biblioteca-modal" role="dialog" aria-modal="true" aria-labelledby="bibliotecaTitle">
+        <div class="biblioteca-panel">
+            <div class="biblioteca-header">
+                <div>
+                    <p class="biblioteca-etiqueta">Recurso digital</p>
+                    <h3 id="bibliotecaTitle">Biblioteca virtual</h3>
+                </div>
+                <button class="biblioteca-cerrar" onclick="cerrarBiblioteca()" type="button" aria-label="Cerrar biblioteca">&times;</button>
+            </div>
+
+            <label class="biblioteca-buscar" for="buscadorBiblioteca">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="buscadorBiblioteca" placeholder="Buscar material...">
+            </label>
+
+            <div id="listaBiblioteca" class="biblioteca-lista"></div>
+        </div>
+    </div>
+
     <footer>
         <p>© 2026 ASPTI | Arquitectura de Plataformas y Servicios de TI</p>
         <div class="redes">
@@ -536,7 +578,7 @@
             <a href="#"><i class="fab fa-tiktok"></i></a>
 
         </div>
-
+        
     </footer>
 
     <a href="#inicio" class="volver-arriba" aria-label="Volver arriba">
@@ -547,23 +589,130 @@
         const formulario = document.getElementById('form-contacto');
         const estado = document.getElementById('estado-envio');
 
-        formulario.addEventListener('submit', async (evento) => {
-            evento.preventDefault();
-            estado.textContent = 'Enviando…';
-            try {
-                const respuesta = await fetch('controlador/guardar.php', {
-                    method: 'POST',
-                    body: new URLSearchParams(new FormData(formulario)),
-                });
-                const cuerpo = await respuesta.json();
-                if (respuesta.ok) {
-                    estado.textContent = 'Mensaje enviado ✓';
-                    formulario.reset();
-                } else {
-                    estado.textContent = cuerpo.error ?? 'No se pudo enviar el mensaje.';
+        if (formulario) {
+            formulario.addEventListener('submit', async (evento) => {
+                evento.preventDefault();
+                estado.textContent = 'Enviando…';
+                try {
+                    const respuesta = await fetch('controlador/guardar.php', {
+                        method: 'POST',
+                        body: new URLSearchParams(new FormData(formulario)),
+                    });
+                    const cuerpo = await respuesta.json();
+                    if (respuesta.ok) {
+                        estado.textContent = 'Mensaje enviado ✓';
+                        formulario.reset();
+                    } else {
+                        estado.textContent = cuerpo.error ?? 'No se pudo enviar el mensaje.';
+                    }
+                } catch {
+                    estado.textContent = 'Error de conexión con el servidor.';
                 }
-            } catch {
-                estado.textContent = 'Error de conexión con el servidor.';
+            });
+        }
+
+        document.getElementById('abrirMesaPartes').addEventListener('click', function (evento) {
+            evento.preventDefault();
+            abrirLogin();
+        });
+
+        function abrirLogin() {
+            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('usuario').focus();
+        }
+
+        function cerrarLogin() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('mensajeLogin').textContent = '';
+        }
+
+        function validarLogin() {
+            const usuario = document.getElementById('usuario').value.trim();
+            const clave = document.getElementById('clave').value.trim();
+            const mensaje = document.getElementById('mensajeLogin');
+
+            if (usuario === 'admin' && clave === '123456') {
+                mensaje.textContent = 'Acceso correcto. Abriendo panel...';
+                mensaje.style.color = '#0f766e';
+                cerrarLogin();
+                window.location.href = 'vista/dashboard.php';
+            } else {
+                mensaje.textContent = 'Usuario o contraseña incorrectos';
+                mensaje.style.color = '#b30000';
+            }
+        }
+
+        const recursosBiblioteca = [
+            {
+                titulo: 'Fundamentos de redes',
+                categoria: 'Tecnología',
+                descripcion: 'Guía práctica de topologías, IP y seguridad básica.'
+            },
+            {
+                titulo: 'Administración de servidores',
+                categoria: 'Infraestructura',
+                descripcion: 'Material sobre Windows Server, Linux y servicios web.'
+            },
+            {
+                titulo: 'Cloud computing',
+                categoria: 'Nube',
+                descripcion: 'Conceptos esenciales de virtualización y plataformas en la nube.'
+            },
+            {
+                titulo: 'Bases de datos',
+                categoria: 'Datos',
+                descripcion: 'Modelado, consultas SQL y diseño de tablas.'
+            }
+        ];
+
+        function renderizarBiblioteca(filtro = '') {
+            const lista = document.getElementById('listaBiblioteca');
+            const texto = filtro.toLowerCase();
+            const filtrados = recursosBiblioteca.filter((recurso) => {
+                return recurso.titulo.toLowerCase().includes(texto) ||
+                    recurso.categoria.toLowerCase().includes(texto) ||
+                    recurso.descripcion.toLowerCase().includes(texto);
+            });
+
+            if (!filtrados.length) {
+                lista.innerHTML = '<p class="biblioteca-vacia">No se encontraron recursos con ese término.</p>';
+                return;
+            }
+
+            lista.innerHTML = filtrados.map((recurso) => `
+                <article class="biblioteca-card">
+                    <div>
+                        <h4>${recurso.titulo}</h4>
+                        <p class="biblioteca-categoria">${recurso.categoria}</p>
+                    </div>
+                    <p>${recurso.descripcion}</p>
+                </article>
+            `).join('');
+        }
+
+        function abrirBiblioteca() {
+            document.getElementById('bibliotecaModal').style.display = 'flex';
+            document.getElementById('buscadorBiblioteca').focus();
+            renderizarBiblioteca();
+        }
+
+        function cerrarBiblioteca() {
+            document.getElementById('bibliotecaModal').style.display = 'none';
+        }
+
+        document.getElementById('buscadorBiblioteca').addEventListener('input', (evento) => {
+            renderizarBiblioteca(evento.target.value);
+        });
+
+        document.getElementById('loginModal').addEventListener('click', (evento) => {
+            if (evento.target.id === 'loginModal') {
+                cerrarLogin();
+            }
+        });
+
+        document.getElementById('bibliotecaModal').addEventListener('click', (evento) => {
+            if (evento.target.id === 'bibliotecaModal') {
+                cerrarBiblioteca();
             }
         });
     </script>
