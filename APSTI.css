@@ -38,7 +38,7 @@
        (para que los enlaces del menú, en <nav>, puedan usarlos) */
     timeline-scope:
         --tl-inicio, --tl-nosotros, --tl-unidades, --tl-modulos,
-        --tl-malla, --tl-beneficios, --tl-docentes, --tl-galeria, --tl-contacto;
+        --tl-malla, --tl-beneficios, --tl-docentes, --tl-galeria, --tl-tramites, --tl-contacto;
 }
 
 *{
@@ -209,6 +209,7 @@ header{
 #beneficios{ view-timeline-name:--tl-beneficios; }
 #docentes{ view-timeline-name:--tl-docentes; }
 #galeria{ view-timeline-name:--tl-galeria; }
+#tramites{ view-timeline-name:--tl-tramites; }
 #contacto{ view-timeline-name:--tl-contacto; }
 
 @keyframes resaltarLink{
@@ -230,6 +231,7 @@ header{
 .menu ul li a[href="#beneficios"]{ animation:resaltarLink linear both; animation-timeline:--tl-beneficios; animation-range:cover 0% cover 100%; }
 .menu ul li a[href="#docentes"]{ animation:resaltarLink linear both; animation-timeline:--tl-docentes; animation-range:cover 0% cover 100%; }
 .menu ul li a[href="#galeria"]{ animation:resaltarLink linear both; animation-timeline:--tl-galeria; animation-range:cover 0% cover 100%; }
+.menu ul li a[href="#tramites"]{ animation:resaltarLink linear both; animation-timeline:--tl-tramites; animation-range:cover 0% cover 100%; }
 .menu ul li a[href="#contacto"]{ animation:resaltarLink linear both; animation-timeline:--tl-contacto; animation-range:cover 0% cover 100%; }
 
 @media (prefers-reduced-motion: reduce){
@@ -864,6 +866,17 @@ section h2{
     }
 }
 
+#tramites{
+    background:var(--color-bg);
+}
+
+#tramites .tramites-intro{
+    max-width:640px;
+    margin:0 auto var(--space-3);
+    text-align:center;
+    color:var(--color-body);
+}
+
 #contacto{
     background:var(--color-surface);
 }
@@ -878,8 +891,13 @@ form{
     border:1px solid var(--color-border);
 }
 
+#tramites form{
+    background:var(--color-surface);
+}
+
 form input,
-form textarea{
+form textarea,
+form select{
     width:100%;
     padding:15px;
     margin-bottom:20px;
@@ -899,9 +917,30 @@ form textarea::placeholder{
 }
 
 form input:focus,
-form textarea:focus{
+form textarea:focus,
+form select:focus{
     border-color:var(--color-brand);
     box-shadow:0 0 0 4px color-mix(in srgb, var(--color-brand) 12%, transparent);
+}
+
+form .campo-archivo{
+    display:block;
+    margin-bottom:20px;
+    font-size:14px;
+    color:var(--color-body);
+}
+
+form .campo-archivo input[type="file"]{
+    display:block;
+    width:100%;
+    margin-top:8px;
+    margin-bottom:0;
+    padding:10px;
+    border:2px dashed var(--color-border);
+    border-radius:var(--radius-sm);
+    background:var(--color-surface);
+    font-family:inherit;
+    font-size:14px;
 }
 
 form textarea{
@@ -1190,4 +1229,42 @@ footer p{
     padding:20px;
     text-align:center;
     color:#7a6f6a;
+}
+
+.biblioteca-acciones{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+}
+
+.biblioteca-descargar{
+    display:inline-block;
+    padding:6px 14px;
+    border-radius:999px;
+    background:var(--color-brand);
+    color:#fff;
+    font-size:.82rem;
+    font-weight:600;
+    text-decoration:none;
+}
+
+.biblioteca-descargar:hover{
+    background:var(--color-brand-deep);
+}
+
+.biblioteca-ver{
+    display:inline-block;
+    padding:6px 14px;
+    border-radius:999px;
+    border:1px solid var(--color-brand);
+    background:transparent;
+    color:var(--color-brand);
+    font-size:.82rem;
+    font-weight:600;
+    text-decoration:none;
+}
+
+.biblioteca-ver:hover{
+    background:var(--color-brand);
+    color:#fff;
 }

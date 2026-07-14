@@ -46,11 +46,12 @@
                 <li><a href="#beneficios">Beneficios</a></li>
                 <li><a href="#docentes">Docentes</a></li>
                 <li><a href="#galeria">Galeria</a></li>
+                <li><a href="#tramites">Mesa de Partes</a></li>
                 <li><a href="#contacto">Contacto</a></li>
 
                 <li>
                     <a href="javascript:void(0);" id="abrirMesaPartes" role="button">
-                       <i class="fa-solid fa-user-lock"></i> Mesa de Partes
+                       <i class="fa-solid fa-user-lock"></i> Panel Administrativo
                     </a>
                </li>
 
@@ -512,6 +513,46 @@
         </div>
 
     </section>
+    <section id="tramites">
+
+        <h2>Mesa de Partes</h2>
+        <p class="tramites-intro">Registra tu solicitud (constancias, certificados, traslados y más) y adjunta el documento que la sustente. Te contactaremos al correo o teléfono que nos dejes.</p>
+
+        <form id="form-tramite" enctype="multipart/form-data">
+
+            <input type="text" name="solicitante" placeholder="Nombre completo" required maxlength="150">
+
+            <input type="email" name="correo" placeholder="Correo" required maxlength="150">
+
+            <input type="tel" name="telefono" placeholder="Teléfono (opcional)" maxlength="30">
+
+            <select name="tipo_tramite" required>
+                <option value="">Selecciona el tipo de trámite</option>
+                <option>Constancia de matrícula</option>
+                <option>Constancia de notas</option>
+                <option>Certificado de estudios</option>
+                <option>Duplicado de carné</option>
+                <option>Traslado interno</option>
+                <option>Retiro / reserva de matrícula</option>
+                <option>Solicitud de práctica pre-profesional</option>
+                <option>Convalidación de cursos</option>
+                <option>Otro</option>
+            </select>
+
+            <label class="campo-archivo">
+                Documento adjunto (opcional, máx. 15 MB)
+                <input type="file" name="documento">
+            </label>
+
+            <button type="submit">
+                Enviar solicitud
+            </button>
+
+            <p id="estado-tramite" role="status"></p>
+
+        </form>
+    </section>
+
     <section id="contacto">
 
         <h2>Contáctanos</h2>
@@ -611,6 +652,31 @@
             });
         }
 
+        const formularioTramite = document.getElementById('form-tramite');
+        const estadoTramite = document.getElementById('estado-tramite');
+
+        if (formularioTramite) {
+            formularioTramite.addEventListener('submit', async (evento) => {
+                evento.preventDefault();
+                estadoTramite.textContent = 'Enviando…';
+                try {
+                    const respuesta = await fetch('controlador/guardar_tramite_publico.php', {
+                        method: 'POST',
+                        body: new FormData(formularioTramite),
+                    });
+                    const cuerpo = await respuesta.json();
+                    if (respuesta.ok) {
+                        estadoTramite.textContent = `Trámite registrado ✓ Tu código es ${cuerpo.codigo}. Te contactaremos pronto.`;
+                        formularioTramite.reset();
+                    } else {
+                        estadoTramite.textContent = cuerpo.error ?? 'No se pudo registrar el trámite.';
+                    }
+                } catch {
+                    estadoTramite.textContent = 'Error de conexión con el servidor.';
+                }
+            });
+        }
+
         document.getElementById('abrirMesaPartes').addEventListener('click', function (evento) {
             evento.preventDefault();
             abrirLogin();
@@ -642,28 +708,26 @@
             }
         }
 
-        const recursosBiblioteca = [
-            {
-                titulo: 'Fundamentos de redes',
-                categoria: 'Tecnología',
-                descripcion: 'Guía práctica de topologías, IP y seguridad básica.'
-            },
-            {
-                titulo: 'Administración de servidores',
-                categoria: 'Infraestructura',
-                descripcion: 'Material sobre Windows Server, Linux y servicios web.'
-            },
-            {
-                titulo: 'Cloud computing',
-                categoria: 'Nube',
-                descripcion: 'Conceptos esenciales de virtualización y plataformas en la nube.'
-            },
-            {
-                titulo: 'Bases de datos',
-                categoria: 'Datos',
-                descripcion: 'Modelado, consultas SQL y diseño de tablas.'
+        let recursosBiblioteca = [];
+
+        function escaparHtml(texto) {
+            const mapa = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+            return String(texto ?? '').replace(/[&<>"']/g, (c) => mapa[c]);
+        }
+
+        async function cargarBiblioteca() {
+            const lista = document.getElementById('listaBiblioteca');
+            lista.innerHTML = '<p class="biblioteca-vacia">Cargando material…</p>';
+            try {
+                const respuesta = await fetch('controlador/listar_biblioteca.php');
+                recursosBiblioteca = await respuesta.json();
+            } catch {
+                recursosBiblioteca = [];
+                lista.innerHTML = '<p class="biblioteca-vacia">No se pudo cargar la biblioteca. Intenta de nuevo más tarde.</p>';
+                return;
             }
-        ];
+            renderizarBiblioteca();
+        }
 
         function renderizarBiblioteca(filtro = '') {
             const lista = document.getElementById('listaBiblioteca');
@@ -671,7 +735,7 @@
             const filtrados = recursosBiblioteca.filter((recurso) => {
                 return recurso.titulo.toLowerCase().includes(texto) ||
                     recurso.categoria.toLowerCase().includes(texto) ||
-                    recurso.descripcion.toLowerCase().includes(texto);
+                    (recurso.descripcion ?? '').toLowerCase().includes(texto);
             });
 
             if (!filtrados.length) {
@@ -682,10 +746,14 @@
             lista.innerHTML = filtrados.map((recurso) => `
                 <article class="biblioteca-card">
                     <div>
-                        <h4>${recurso.titulo}</h4>
-                        <p class="biblioteca-categoria">${recurso.categoria}</p>
+                        <h4>${escaparHtml(recurso.titulo)}</h4>
+                        <p class="biblioteca-categoria">${escaparHtml(recurso.categoria)}</p>
                     </div>
-                    <p>${recurso.descripcion}</p>
+                    ${recurso.descripcion ? `<p>${escaparHtml(recurso.descripcion)}</p>` : ''}
+                    <div class="biblioteca-acciones">
+                        <a class="biblioteca-ver" href="${encodeURI(recurso.ver)}" target="_blank" rel="noopener">Ver</a>
+                        <a class="biblioteca-descargar" href="${encodeURI(recurso.descarga)}">Descargar (${escaparHtml(recurso.tamano)})</a>
+                    </div>
                 </article>
             `).join('');
         }
@@ -693,7 +761,7 @@
         function abrirBiblioteca() {
             document.getElementById('bibliotecaModal').style.display = 'flex';
             document.getElementById('buscadorBiblioteca').focus();
-            renderizarBiblioteca();
+            cargarBiblioteca();
         }
 
         function cerrarBiblioteca() {
