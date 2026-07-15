@@ -642,7 +642,7 @@ function iconoArchivo($nombreArchivo)
             </ul>
             <div class="sidebar-pie">
                 <a href="../index.html">← Volver al sitio</a>
-                <a href="../controlador/logout.php">Cerrar sesión</a>
+                <a href="../controlador/auth.php?action=logout">Cerrar sesión</a>
             </div>
         </aside>
 
@@ -683,7 +683,7 @@ function iconoArchivo($nombreArchivo)
 
                     <article class="panel">
                         <h2>➕ Registrar nuevo trámite</h2>
-                        <form method="post" action="../controlador/guardar_tramite.php" class="form-grid">
+                        <form method="post" action="../controlador/tramite.php?action=guardar" class="form-grid">
                             <label>
                                 Solicitante
                                 <input type="text" name="solicitante" placeholder="Nombre completo" required>
@@ -755,7 +755,7 @@ function iconoArchivo($nombreArchivo)
                                                     <?php endif; ?>
                                                 </td>
                                                 <td>
-                                                    <form method="post" action="../controlador/actualizar_area_tramite.php" class="form-estado">
+                                                    <form method="post" action="../controlador/tramite.php?action=actualizar_area" class="form-estado">
                                                         <input type="hidden" name="id" value="<?php echo $t['id']; ?>">
                                                         <select name="area_destino" onchange="this.form.submit()">
                                                             <?php foreach (AREAS_DESTINO_PERMITIDAS as $area): ?>
@@ -766,7 +766,7 @@ function iconoArchivo($nombreArchivo)
                                                 </td>
                                                 <td><?php echo date('d/m/Y', strtotime($t['fecha_registro'])); ?></td>
                                                 <td>
-                                                    <form method="post" action="../controlador/actualizar_estado_tramite.php" class="form-estado">
+                                                    <form method="post" action="../controlador/tramite.php?action=actualizar_estado" class="form-estado">
                                                         <input type="hidden" name="id" value="<?php echo $t['id']; ?>">
                                                         <select name="estado" class="badge-estado <?php echo $t['estado']; ?>" onchange="this.form.submit()">
                                                             <?php foreach (ESTADOS_TRAMITE_PERMITIDOS as $valor => $etiqueta): ?>
@@ -777,9 +777,9 @@ function iconoArchivo($nombreArchivo)
                                                 </td>
                                                 <td class="acciones-tramite">
                                                     <?php if (!empty($t['documento_nombre'])): ?>
-                                                        <a href="../controlador/descargar_documento_tramite.php?id=<?php echo $t['id']; ?>&ver=1" target="_blank" rel="noopener" class="btn-ver">📎 Ver doc.</a>
+                                                        <a href="../controlador/tramite.php?action=descargar_documento&id=<?php echo $t['id']; ?>&ver=1" target="_blank" rel="noopener" class="btn-ver">📎 Ver doc.</a>
                                                     <?php endif; ?>
-                                                    <form method="post" action="../controlador/eliminar_tramite.php" onsubmit="return confirm('¿Eliminar este trámite?')">
+                                                    <form method="post" action="../controlador/tramite.php?action=eliminar" onsubmit="return confirm('¿Eliminar este trámite?')">
                                                         <button type="submit" name="eliminar" value="<?php echo $t['id']; ?>" class="btn-eliminar">Eliminar</button>
                                                     </form>
                                                 </td>
@@ -819,7 +819,7 @@ function iconoArchivo($nombreArchivo)
                     <article class="panel">
                         <h2>⬆️ Subir material</h2>
                         <p>El archivo se guarda directamente en la base de datos (máximo 15 MB).</p>
-                        <form method="post" action="../controlador/guardar_archivo.php" enctype="multipart/form-data" class="form-grid">
+                        <form method="post" action="../controlador/biblioteca.php?action=guardar" enctype="multipart/form-data" class="form-grid">
                             <label>
                                 Título
                                 <input type="text" name="titulo" placeholder="Nombre del recurso" required>
@@ -866,9 +866,9 @@ function iconoArchivo($nombreArchivo)
                                             </span>
                                         </div>
                                         <div class="archivo-acciones">
-                                            <a href="../controlador/descargar_archivo.php?id=<?php echo $a['id']; ?>&ver=1" target="_blank" rel="noopener" class="btn-ver">Ver</a>
-                                            <a href="../controlador/descargar_archivo.php?id=<?php echo $a['id']; ?>" class="btn-descargar">Descargar</a>
-                                            <form method="post" action="../controlador/eliminar_archivo.php" onsubmit="return confirm('¿Eliminar este archivo?')">
+                                            <a href="../controlador/biblioteca.php?action=descargar&id=<?php echo $a['id']; ?>&ver=1" target="_blank" rel="noopener" class="btn-ver">Ver</a>
+                                            <a href="../controlador/biblioteca.php?action=descargar&id=<?php echo $a['id']; ?>" class="btn-descargar">Descargar</a>
+                                            <form method="post" action="../controlador/biblioteca.php?action=eliminar" onsubmit="return confirm('¿Eliminar este archivo?')">
                                                 <button type="submit" name="eliminar" value="<?php echo $a['id']; ?>" class="btn-eliminar">Eliminar</button>
                                             </form>
                                         </div>
@@ -907,12 +907,12 @@ function iconoArchivo($nombreArchivo)
                             <p><?php echo nl2br(htmlspecialchars($fila['mensaje'])); ?></p>
                             <div class="mensaje-acciones">
                                 <?php if ((int) $fila['leido'] === 0): ?>
-                                    <form method="post" action="../controlador/marcar_leido_mensaje.php">
+                                    <form method="post" action="../controlador/mensaje.php?action=marcar_leido">
                                         <input type="hidden" name="id" value="<?php echo $fila['id']; ?>">
                                         <button type="submit" class="btn-ver">Marcar como leído</button>
                                     </form>
                                 <?php endif; ?>
-                                <form method="post" action="../controlador/eliminar.php" onsubmit="return confirm('¿Eliminar este mensaje?')">
+                                <form method="post" action="../controlador/mensaje.php?action=eliminar" onsubmit="return confirm('¿Eliminar este mensaje?')">
                                     <button type="submit" name="eliminar" value="<?php echo $fila['id']; ?>">Eliminar</button>
                                 </form>
                             </div>

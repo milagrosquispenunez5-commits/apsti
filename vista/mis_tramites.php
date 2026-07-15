@@ -207,7 +207,7 @@ $nombre = $_SESSION['usuario_nombre'];
             <h1>👤 Mis trámites — <?php echo htmlspecialchars($nombre); ?></h1>
             <div class="acciones">
                 <a href="../index.html">← Volver al sitio</a>
-                <a href="../controlador/logout.php">Cerrar sesión</a>
+                <a href="../controlador/auth.php?action=logout">Cerrar sesión</a>
             </div>
         </div>
     </header>
@@ -272,7 +272,7 @@ $nombre = $_SESSION['usuario_nombre'];
                                     <td><span class="badge-estado <?php echo $t['estado']; ?>"><?php echo ESTADOS_TRAMITE_PERMITIDOS[$t['estado']]; ?></span></td>
                                     <td>
                                         <?php if (!empty($t['documento_nombre'])): ?>
-                                            <a href="../controlador/descargar_documento_tramite.php?id=<?php echo $t['id']; ?>&ver=1" target="_blank" rel="noopener" class="btn-ver">📎 Ver doc.</a>
+                                            <a href="../controlador/tramite.php?action=descargar_documento&id=<?php echo $t['id']; ?>&ver=1" target="_blank" rel="noopener" class="btn-ver">📎 Ver doc.</a>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -299,7 +299,7 @@ $nombre = $_SESSION['usuario_nombre'];
             evento.preventDefault();
             estadoTramite.textContent = 'Enviando…';
             try {
-                const respuesta = await fetch('../controlador/guardar_tramite_publico.php', {
+                const respuesta = await fetch('../controlador/tramite.php?action=guardar_publico', {
                     method: 'POST',
                     body: new FormData(formularioTramite),
                 });

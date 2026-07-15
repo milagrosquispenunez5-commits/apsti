@@ -701,7 +701,7 @@
                 evento.preventDefault();
                 estado.textContent = 'Enviando…';
                 try {
-                    const respuesta = await fetch('controlador/guardar.php', {
+                    const respuesta = await fetch('controlador/mensaje.php?action=guardar', {
                         method: 'POST',
                         body: new URLSearchParams(new FormData(formulario)),
                     });
@@ -735,7 +735,7 @@
                 estadoTramite.textContent = 'Enviando…';
                 estadoTramite.style.color = '';
                 try {
-                    const respuesta = await fetch('controlador/guardar_tramite_publico.php', {
+                    const respuesta = await fetch('controlador/tramite.php?action=guardar_publico', {
                         method: 'POST',
                         body: new FormData(formularioTramite),
                     });
@@ -803,7 +803,7 @@
 
                 try {
                     const datos = new URLSearchParams(new FormData(formularioConsulta));
-                    const respuesta = await fetch('controlador/consultar_tramite.php', {
+                    const respuesta = await fetch('controlador/tramite.php?action=consultar', {
                         method: 'POST',
                         body: datos
                     });
@@ -892,7 +892,7 @@
             mensaje.style.color = '';
 
             try {
-                const respuesta = await fetch('controlador/login.php', {
+                const respuesta = await fetch('controlador/auth.php?action=login', {
                     method: 'POST',
                     body: new URLSearchParams({ correo, clave }),
                 });
@@ -928,7 +928,7 @@
             mensaje.style.color = '';
 
             try {
-                const respuesta = await fetch('controlador/registro.php', {
+                const respuesta = await fetch('controlador/auth.php?action=registro', {
                     method: 'POST',
                     body: new URLSearchParams({ nombre, correo, telefono, clave }),
                 });
@@ -953,7 +953,7 @@
             const menuTramites = document.getElementById('menu-tramites');
             let sesion = { autenticado: false };
             try {
-                const respuesta = await fetch('controlador/sesion_actual.php');
+                const respuesta = await fetch('controlador/auth.php?action=sesion_actual');
                 sesion = await respuesta.json();
             } catch {
                 sesion = { autenticado: false };
@@ -977,7 +977,7 @@
                 }
                 acciones.innerHTML = `
                     <span class="saludo-sesion">Hola, ${escaparHtml(sesion.nombre)}</span>
-                    <a href="controlador/logout.php" class="btn-iniciar-sesion">Cerrar sesión</a>
+                    <a href="controlador/auth.php?action=logout" class="btn-iniciar-sesion">Cerrar sesión</a>
                 `;
             } else {
                 if (menuTramites) {
@@ -1022,7 +1022,7 @@
             const lista = document.getElementById('listaBiblioteca');
             lista.innerHTML = '<p class="biblioteca-vacia">Cargando material…</p>';
             try {
-                const respuesta = await fetch('controlador/listar_biblioteca.php');
+                const respuesta = await fetch('controlador/biblioteca.php?action=listar');
                 recursosBiblioteca = await respuesta.json();
             } catch {
                 recursosBiblioteca = [];
