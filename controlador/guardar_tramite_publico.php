@@ -14,17 +14,42 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-if (!estaAutenticado() || rolActual() !== 'cliente') {
-    http_response_code(401);
-    echo json_encode(['error' => 'Debes iniciar sesión como cliente para enviar un trámite.']);
-    exit;
+$idUsuario = null;
+$solicitante = '';
+$correo = '';
+$telefono = null;
+
+if (estaAutenticado() && rolActual() === 'cliente') {
+    $usuario = obtenerUsuarioPorId(idUsuarioActual());
+    if ($usuario) {
+        $idUsuario = $usuario['id'];
+        $solicitante = $usuario['nombre'];
+        $correo = $usuario['correo'];
+        $telefono = $usuario['telefono'];
+    }
 }
 
-$usuario = obtenerUsuarioPorId(idUsuarioActual());
-if (!$usuario) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Tu sesión ya no es válida. Inicia sesión de nuevo.']);
-    exit;
+if ($idUsuario === null) {
+    // Es un trámite público registrado por un invitado
+    $solicitante = trim($_POST['solicitante'] ?? '');
+    $correo = trim($_POST['correo'] ?? '');
+    $telefono = trim($_POST['telefono'] ?? '');
+    
+    if (empty($solicitante) || empty($correo)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Debes completar tu nombre completo y correo electrónico para enviar el trámite.']);
+        exit;
+    }
+    
+    if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'El formato del correo electrónico no es válido.']);
+        exit;
+    }
+    
+    if (empty($telefono)) {
+        $telefono = null;
+    }
 }
 
 $tipoTramite = trim($_POST['tipo_tramite'] ?? '');
@@ -63,10 +88,10 @@ if (isset($_FILES['documento']) && $_FILES['documento']['error'] !== UPLOAD_ERR_
 }
 
 $id = guardarTramitePublico(
-    $usuario['id'],
-    $usuario['nombre'],
-    $usuario['correo'],
-    $usuario['telefono'],
+    $idUsuario,
+    $solicitante,
+    $correo,
+    $telefono,
     $tipoTramite,
     $detalle,
     $documentoNombre,

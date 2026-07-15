@@ -106,6 +106,20 @@ function actualizarAreaTramite($id, $area)
     return $sql->execute();
 }
 
+// Devuelve los detalles de un trámite por su id
+function obtenerTramitePorId($id)
+{
+    global $conexion;
+    $sql = $conexion->prepare(
+        'SELECT id, solicitante, correo, telefono, tipo_tramite, detalle, area_destino, origen, estado, documento_nombre, fecha_registro
+         FROM tramites WHERE id = ?'
+    );
+    $sql->bind_param('i', $id);
+    $sql->execute();
+    $resultado = $sql->get_result();
+    return $resultado ? $resultado->fetch_assoc() : null;
+}
+
 // Elimina un trámite por su id
 function eliminarTramite($id)
 {
@@ -114,3 +128,4 @@ function eliminarTramite($id)
     $sql->bind_param('i', $id);
     return $sql->execute();
 }
+

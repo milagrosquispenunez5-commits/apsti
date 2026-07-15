@@ -52,7 +52,7 @@
                 <li><a href="#beneficios">Beneficios</a></li>
                 <li><a href="#docentes">Docentes</a></li>
                 <li><a href="#galeria">Galeria</a></li>
-                <li><a href="javascript:void(0);" onclick="abrirTramites()" role="button">Mesa de Partes</a></li>
+                <li><a href="javascript:void(0);" onclick="abrirTramites()" role="button" id="menu-tramites">Mesa de Partes</a></li>
                 <li><a href="#contacto">Contacto</a></li>
 
             </ul>
@@ -524,18 +524,27 @@
                 </div>
             </div>
 
-            <div id="tramitesSinSesion" class="tramites-gate">
-                <p class="tramites-intro">Para registrar un trámite y poder darle seguimiento después, primero inicia sesión o crea una cuenta.</p>
-                <div class="tramites-gate-botones">
-                    <button type="button" onclick="cerrarTramites(); abrirLogin();">Iniciar sesión</button>
-                    <button type="button" class="secundario" onclick="cerrarTramites(); abrirRegistro();">Crear cuenta</button>
-                </div>
+            <!-- Pestañas (Tabs) -->
+            <div class="tramites-tabs" style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--color-border); padding-bottom: 10px;">
+                <button type="button" class="tab-btn active" onclick="cambiarTabTramite('registrar')" id="tabBtnRegistrar" style="background: none; border: none; font-family: inherit; font-size: 1rem; font-weight: 600; padding: 6px 12px; cursor: pointer; color: var(--color-brand); border-bottom: 2px solid var(--color-brand); outline: none;">Registrar Trámite</button>
+                <button type="button" class="tab-btn" onclick="cambiarTabTramite('consultar')" id="tabBtnConsultar" style="background: none; border: none; font-family: inherit; font-size: 1rem; font-weight: 500; padding: 6px 12px; cursor: pointer; color: var(--color-body); border-bottom: 2px solid transparent; outline: none;">Consultar Estado</button>
             </div>
 
-            <div id="tramitesConSesion" style="display:none;">
+            <!-- Contenido Registrar -->
+            <div id="tabContenidoRegistrar">
                 <p class="tramites-intro">Registra tu solicitud (constancias, certificados, traslados y más) y adjunta el documento que la sustente. El personal de Mesa de Partes revisará tu solicitud y se comunicará contigo.</p>
 
                 <form id="form-tramite" enctype="multipart/form-data">
+                    <div id="datosInvitadoTramite">
+                        <p style="font-size: 0.9rem; color: #706967; margin-bottom: 12px;">
+                            ¿Tienes cuenta? 
+                            <a href="javascript:void(0);" onclick="cerrarTramites(); abrirLogin();" style="color: var(--color-brand); font-weight: 600; text-decoration: none;">Inicia sesión</a> 
+                            para no tener que llenar tus datos y ver tu historial.
+                        </p>
+                        <input type="text" name="solicitante" id="solicitanteTramite" placeholder="Nombre completo" required>
+                        <input type="email" name="correo" id="correoTramite" placeholder="Correo electrónico" required>
+                        <input type="tel" name="telefono" id="telefonoTramite" placeholder="Teléfono / Celular (opcional)">
+                    </div>
 
                     <select name="tipo_tramite" id="tipoTramite" required>
                         <option value="">Selecciona el tipo de trámite</option>
@@ -561,11 +570,35 @@
                         Enviar solicitud
                     </button>
 
-                    <p id="estado-tramite" role="status"></p>
+                    <p id="estado-tramite" role="status" style="margin-top: 10px; font-weight: 500; min-height: 20px;"></p>
+                </form>
+            </div>
 
+            <!-- Contenido Consultar -->
+            <div id="tabContenidoConsultar" style="display: none;">
+                <p class="tramites-intro">Consulta el estado actual de tu trámite utilizando el código único recibido y el correo electrónico registrado.</p>
+
+                <form id="form-consulta-tramite">
+                    <input type="text" id="codigoConsulta" name="codigo" placeholder="Código de trámite (ej. MP-2026-0001)" required>
+                    <input type="email" id="correoConsulta" name="correo" placeholder="Correo electrónico" required>
+                    <button type="submit">
+                        Consultar estado
+                    </button>
+                    <p id="estado-consulta" role="status" style="margin-top: 10px; font-weight: 500; min-height: 20px;"></p>
                 </form>
 
-                <p class="login-alterno"><a href="vista/mis_tramites.php">Ver mis trámites →</a></p>
+                <div id="resultadoConsultaTramite" style="display: none; margin-top: 20px; padding: 15px; background: #faf7f5; border: 1px solid var(--color-border); border-radius: var(--radius-md);">
+                    <h4 style="color: var(--color-brand-deep); margin-bottom: 12px; font-size: 1rem; border-bottom: 1px solid var(--color-border); padding-bottom: 6px;">Detalles de la Solicitud</h4>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                        <tr style="border-bottom: 1px solid #f0eae5;"><td style="padding: 6px 0; font-weight: 600; color: var(--color-body); width: 120px;">Código:</td><td id="resCodigo" style="padding: 6px 0; font-family: monospace;"></td></tr>
+                        <tr style="border-bottom: 1px solid #f0eae5;"><td style="padding: 6px 0; font-weight: 600; color: var(--color-body);">Solicitante:</td><td id="resSolicitante" style="padding: 6px 0;"></td></tr>
+                        <tr style="border-bottom: 1px solid #f0eae5;"><td style="padding: 6px 0; font-weight: 600; color: var(--color-body);">Tipo:</td><td id="resTipo" style="padding: 6px 0;"></td></tr>
+                        <tr style="border-bottom: 1px solid #f0eae5;"><td style="padding: 6px 0; font-weight: 600; color: var(--color-body);">Fecha:</td><td id="resFecha" style="padding: 6px 0;"></td></tr>
+                        <tr style="border-bottom: 1px solid #f0eae5;"><td style="padding: 6px 0; font-weight: 600; color: var(--color-body);">Área asignada:</td><td id="resArea" style="padding: 6px 0;"></td></tr>
+                        <tr style="border-bottom: 1px solid #f0eae5;"><td style="padding: 6px 0; font-weight: 600; color: var(--color-body);">Estado:</td><td style="padding: 6px 0;"><span id="resEstado" style="display: inline-block;"></span></td></tr>
+                        <tr id="resFilaDocumento" style="border-bottom: none;"><td style="padding: 6px 0; font-weight: 600; color: var(--color-body);">Adjunto:</td><td id="resDocumento" style="padding: 6px 0; font-weight: 500; color: var(--color-brand-deep);"></td></tr>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -700,6 +733,7 @@
             formularioTramite.addEventListener('submit', async (evento) => {
                 evento.preventDefault();
                 estadoTramite.textContent = 'Enviando…';
+                estadoTramite.style.color = '';
                 try {
                     const respuesta = await fetch('controlador/guardar_tramite_publico.php', {
                         method: 'POST',
@@ -708,12 +742,123 @@
                     const cuerpo = await respuesta.json();
                     if (respuesta.ok) {
                         estadoTramite.textContent = `Trámite registrado ✓ Tu código es ${cuerpo.codigo}. Guárdalo para hacer seguimiento; el personal se comunicará contigo pronto.`;
+                        estadoTramite.style.color = '#0f766e';
                         formularioTramite.reset();
                     } else {
                         estadoTramite.textContent = cuerpo.error ?? 'No se pudo registrar el trámite.';
+                        estadoTramite.style.color = '#b30000';
                     }
                 } catch {
                     estadoTramite.textContent = 'Error de conexión con el servidor.';
+                    estadoTramite.style.color = '#b30000';
+                }
+            });
+        }
+
+        function cambiarTabTramite(tab) {
+            const tabReg = document.getElementById('tabContenidoRegistrar');
+            const tabCon = document.getElementById('tabContenidoConsultar');
+            const btnReg = document.getElementById('tabBtnRegistrar');
+            const btnCon = document.getElementById('tabBtnConsultar');
+
+            if (tab === 'registrar') {
+                if (tabReg) tabReg.style.display = 'block';
+                if (tabCon) tabCon.style.display = 'none';
+                if (btnReg) {
+                    btnReg.style.color = 'var(--color-brand)';
+                    btnReg.style.borderBottomColor = 'var(--color-brand)';
+                    btnReg.style.fontWeight = '600';
+                }
+                if (btnCon) {
+                    btnCon.style.color = 'var(--color-body)';
+                    btnCon.style.borderBottomColor = 'transparent';
+                    btnCon.style.fontWeight = '500';
+                }
+            } else {
+                if (tabReg) tabReg.style.display = 'none';
+                if (tabCon) tabCon.style.display = 'block';
+                if (btnCon) {
+                    btnCon.style.color = 'var(--color-brand)';
+                    btnCon.style.borderBottomColor = 'var(--color-brand)';
+                    btnCon.style.fontWeight = '600';
+                }
+                if (btnReg) {
+                    btnReg.style.color = 'var(--color-body)';
+                    btnReg.style.borderBottomColor = 'transparent';
+                    btnReg.style.fontWeight = '500';
+                }
+            }
+        }
+
+        const formularioConsulta = document.getElementById('form-consulta-tramite');
+        const estadoConsulta = document.getElementById('estado-consulta');
+        const resultadoConsulta = document.getElementById('resultadoConsultaTramite');
+
+        if (formularioConsulta) {
+            formularioConsulta.addEventListener('submit', async (evento) => {
+                evento.preventDefault();
+                estadoConsulta.textContent = 'Buscando…';
+                estadoConsulta.style.color = '';
+                if (resultadoConsulta) resultadoConsulta.style.display = 'none';
+
+                try {
+                    const datos = new URLSearchParams(new FormData(formularioConsulta));
+                    const respuesta = await fetch('controlador/consultar_tramite.php', {
+                        method: 'POST',
+                        body: datos
+                    });
+                    const cuerpo = await respuesta.json();
+
+                    if (respuesta.ok && cuerpo.ok) {
+                        estadoConsulta.textContent = '';
+                        if (resultadoConsulta) resultadoConsulta.style.display = 'block';
+                        
+                        document.getElementById('resCodigo').textContent = cuerpo.tramite.codigo;
+                        document.getElementById('resSolicitante').textContent = cuerpo.tramite.solicitante;
+                        document.getElementById('resTipo').textContent = cuerpo.tramite.tipo_tramite;
+                        document.getElementById('resFecha').textContent = cuerpo.tramite.fecha;
+                        document.getElementById('resArea').textContent = cuerpo.tramite.area_destino;
+                        
+                        const badge = document.getElementById('resEstado');
+                        if (badge) {
+                            badge.textContent = cuerpo.tramite.estado_legible;
+                            badge.className = ''; 
+                            badge.style.display = 'inline-block';
+                            badge.style.padding = '4px 10px';
+                            badge.style.borderRadius = '999px';
+                            badge.style.fontSize = '0.8rem';
+                            badge.style.fontWeight = '600';
+
+                            if (cuerpo.tramite.estado === 'pendiente') {
+                                badge.style.background = '#fdecea';
+                                badge.style.color = '#b30000';
+                            } else if (cuerpo.tramite.estado === 'proceso') {
+                                badge.style.background = '#fff4de';
+                                badge.style.color = '#8a5a00';
+                            } else if (cuerpo.tramite.estado === 'atendido') {
+                                badge.style.background = '#e6f4ea';
+                                badge.style.color = '#1e7a34';
+                            } else {
+                                badge.style.background = '#ececec';
+                                badge.style.color = '#5a5350';
+                            }
+                        }
+
+                        const filaDoc = document.getElementById('resFilaDocumento');
+                        const linkDoc = document.getElementById('resDocumento');
+                        if (cuerpo.tramite.documento) {
+                            if (filaDoc) filaDoc.style.display = 'table-row';
+                            if (linkDoc) linkDoc.textContent = '📎 ' + cuerpo.tramite.documento;
+                        } else {
+                            if (filaDoc) filaDoc.style.display = 'none';
+                        }
+                    } else {
+                        estadoConsulta.textContent = cuerpo.error ?? 'No se pudo consultar el trámite.';
+                        estadoConsulta.style.color = '#b30000';
+                    }
+                } catch {
+                    estadoConsulta.textContent = 'Error de conexión con el servidor.';
+                    estadoConsulta.style.color = '#b30000';
                 }
             });
         }
@@ -805,6 +950,7 @@
 
         async function actualizarEstadoSesion() {
             const acciones = document.getElementById('accionesHeader');
+            const menuTramites = document.getElementById('menu-tramites');
             let sesion = { autenticado: false };
             try {
                 const respuesta = await fetch('controlador/sesion_actual.php');
@@ -814,14 +960,32 @@
             }
 
             if (sesion.autenticado) {
-                const panel = sesion.rol === 'administrador' ? 'vista/dashboard.php' : 'vista/mis_tramites.php';
-                const etiquetaPanel = sesion.rol === 'administrador' ? 'Panel administrativo' : 'Mis trámites';
+                if (sesion.rol === 'cliente') {
+                    if (menuTramites) {
+                        menuTramites.textContent = 'Mis trámites';
+                        menuTramites.href = 'vista/mis_tramites.php';
+                        menuTramites.onclick = null;
+                        menuTramites.removeAttribute('role');
+                    }
+                } else if (sesion.rol === 'administrador') {
+                    if (menuTramites) {
+                        menuTramites.textContent = 'Panel administrativo';
+                        menuTramites.href = 'vista/dashboard.php';
+                        menuTramites.onclick = null;
+                        menuTramites.removeAttribute('role');
+                    }
+                }
                 acciones.innerHTML = `
                     <span class="saludo-sesion">Hola, ${escaparHtml(sesion.nombre)}</span>
-                    <a href="${panel}" class="btn-iniciar-sesion">${etiquetaPanel}</a>
                     <a href="controlador/logout.php" class="btn-iniciar-sesion">Cerrar sesión</a>
                 `;
             } else {
+                if (menuTramites) {
+                    menuTramites.textContent = 'Mesa de Partes';
+                    menuTramites.href = 'javascript:void(0);';
+                    menuTramites.onclick = function() { abrirTramites(); };
+                    menuTramites.setAttribute('role', 'button');
+                }
                 acciones.innerHTML = `
                     <button onclick="abrirLogin()" class="btn-iniciar-sesion" type="button" aria-label="Iniciar sesión">
                         <i class="fa-solid fa-sign-in-alt"></i> Iniciar sesión
@@ -829,11 +993,22 @@
                 `;
             }
 
-            const gateSinSesion = document.getElementById('tramitesSinSesion');
-            const gateConSesion = document.getElementById('tramitesConSesion');
+            const datosInvitado = document.getElementById('datosInvitadoTramite');
+            const solicitante = document.getElementById('solicitanteTramite');
+            const correo = document.getElementById('correoTramite');
             const esCliente = sesion.autenticado && sesion.rol === 'cliente';
-            gateSinSesion.style.display = esCliente ? 'none' : 'block';
-            gateConSesion.style.display = esCliente ? 'block' : 'none';
+
+            if (datosInvitado) {
+                if (esCliente) {
+                    datosInvitado.style.display = 'none';
+                    if (solicitante) solicitante.required = false;
+                    if (correo) correo.required = false;
+                } else {
+                    datosInvitado.style.display = 'block';
+                    if (solicitante) solicitante.required = true;
+                    if (correo) correo.required = true;
+                }
+            }
         }
 
         let recursosBiblioteca = [];
