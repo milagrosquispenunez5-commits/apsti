@@ -1,5 +1,5 @@
 <?php
-// CONTROLADOR — Módulo de Autenticación y Cuentas de Usuario.
+
 require_once __DIR__ . '/../modelo/auth.php';
 require_once __DIR__ . '/../modelo/usuario.php';
 
@@ -7,7 +7,7 @@ $action = $_REQUEST['action'] ?? '';
 
 switch ($action) {
     case 'login':
-        // Iniciar sesión
+        
         header('Content-Type: application/json; charset=utf-8');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
@@ -29,13 +29,13 @@ switch ($action) {
         exit;
 
     case 'logout':
-        // Cerrar sesión activa
+        
         cerrarSesionUsuario();
         header('Location: ../index.html');
         exit;
 
     case 'registro':
-        // Registro de un nuevo cliente
+        
         header('Content-Type: application/json; charset=utf-8');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
@@ -84,7 +84,7 @@ switch ($action) {
         exit;
 
     case 'sesion_actual':
-        // Devuelve el estado de la sesión activa para la UI del cliente
+        
         header('Content-Type: application/json; charset=utf-8');
         if (estaAutenticado()) {
             echo json_encode([

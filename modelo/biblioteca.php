@@ -1,11 +1,11 @@
 <?php
-// MODELO — Operaciones sobre la tabla "biblioteca" (biblioteca digital).
-// El archivo se guarda dentro de la base de datos (columna LONGBLOB).
+
+
 require_once __DIR__ . '/conexion.php';
 
 const CATEGORIAS_BIBLIOTECA_PERMITIDAS = ['Guía de estudio', 'Material digital', 'Recurso recomendado'];
 
-// Guarda un archivo y devuelve su id (o false si falló)
+
 function guardarArchivoBiblioteca($titulo, $descripcion, $categoria, $nombreArchivo, $tipoMime, $tamanoBytes, $contenido)
 {
     global $conexion;
@@ -14,7 +14,7 @@ function guardarArchivoBiblioteca($titulo, $descripcion, $categoria, $nombreArch
     return $sql->execute() ? $conexion->insert_id : false;
 }
 
-// Devuelve el listado de archivos (sin el contenido binario) del más reciente al más antiguo
+
 function listarArchivosBiblioteca()
 {
     global $conexion;
@@ -25,7 +25,7 @@ function listarArchivosBiblioteca()
     return $resultado ? $resultado->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-// Devuelve nombre, tipo y contenido de un archivo para poder descargarlo
+
 function obtenerArchivoBiblioteca($id)
 {
     global $conexion;
@@ -36,7 +36,7 @@ function obtenerArchivoBiblioteca($id)
     return $resultado ? $resultado->fetch_assoc() : null;
 }
 
-// Elimina un archivo por su id
+
 function eliminarArchivoBiblioteca($id)
 {
     global $conexion;
@@ -45,7 +45,7 @@ function eliminarArchivoBiblioteca($id)
     return $sql->execute();
 }
 
-// Convierte un tamaño en bytes a un texto legible (KB/MB)
+
 function formatearTamano($bytes)
 {
     if ($bytes >= 1048576) {

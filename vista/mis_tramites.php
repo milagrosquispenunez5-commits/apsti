@@ -1,5 +1,5 @@
 <?php
-// VISTA — Portal del cliente: registrar y hacer seguimiento de sus propios trámites.
+
 require_once __DIR__ . '/../modelo/auth.php';
 requerirRol('cliente');
 

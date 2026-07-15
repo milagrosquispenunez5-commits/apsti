@@ -1,9 +1,9 @@
 <?php
-// MODELO — Operaciones sobre la tabla "mensajes".
-// Los controladores y las vistas usan estas funciones; nadie más toca la base.
+
+
 require_once __DIR__ . '/conexion.php';
 
-// Guarda un mensaje y devuelve su id (o false si falló)
+
 function guardarMensaje($nombre, $correo, $mensaje)
 {
     global $conexion;
@@ -12,7 +12,7 @@ function guardarMensaje($nombre, $correo, $mensaje)
     return $sql->execute() ? $conexion->insert_id : false;
 }
 
-// Devuelve todos los mensajes, del más reciente al más antiguo
+
 function listarMensajes()
 {
     global $conexion;
@@ -20,7 +20,7 @@ function listarMensajes()
     return $resultado ? $resultado->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-// Elimina un mensaje por su id
+
 function eliminarMensaje($id)
 {
     global $conexion;
@@ -29,7 +29,7 @@ function eliminarMensaje($id)
     return $sql->execute();
 }
 
-// Marca un mensaje como leído
+
 function marcarMensajeLeido($id)
 {
     global $conexion;

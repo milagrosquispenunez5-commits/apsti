@@ -1,5 +1,5 @@
 <?php
-// CONTROLADOR — Módulo de Biblioteca Digital.
+
 require_once __DIR__ . '/../modelo/auth.php';
 require_once __DIR__ . '/../modelo/biblioteca.php';
 require_once __DIR__ . '/../modelo/validacion_archivos.php';
@@ -8,9 +8,9 @@ $action = $_REQUEST['action'] ?? '';
 
 switch ($action) {
     case 'guardar':
-        // Guardar/subir archivo a la biblioteca digital (admin)
+        
         requerirRol('administrador');
-        $tamanoMaximo = 15 * 1024 * 1024; // 15 MB
+        $tamanoMaximo = 15 * 1024 * 1024; 
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['archivo'])) {
             $titulo = trim($_POST['titulo'] ?? '');
@@ -46,7 +46,7 @@ switch ($action) {
         exit;
 
     case 'eliminar':
-        // Eliminar archivo de la biblioteca digital (admin)
+        
         requerirRol('administrador');
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar'])) {
             eliminarArchivoBiblioteca((int) $_POST['eliminar']);
@@ -55,7 +55,7 @@ switch ($action) {
         exit;
 
     case 'descargar':
-        // Descargar o previsualizar un archivo de la biblioteca (público)
+        
         $id = (int) ($_GET['id'] ?? 0);
         $archivo = $id > 0 ? obtenerArchivoBiblioteca($id) : null;
 
@@ -74,7 +74,7 @@ switch ($action) {
         exit;
 
     case 'listar':
-        // Listar todos los archivos en formato JSON para el frontend (público)
+        
         header('Content-Type: application/json; charset=utf-8');
         $archivos = listarArchivosBiblioteca();
 

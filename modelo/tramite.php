@@ -1,5 +1,5 @@
 <?php
-// MODELO — Operaciones sobre la tabla "tramites" (mesa de partes).
+
 require_once __DIR__ . '/conexion.php';
 
 const TIPOS_TRAMITE_PERMITIDOS = [
@@ -30,7 +30,7 @@ const ESTADOS_TRAMITE_PERMITIDOS = [
     'rechazado' => 'Rechazado',
 ];
 
-// Guarda un trámite registrado por el personal (desde el dashboard) y devuelve su id
+
 function guardarTramite($solicitante, $tipoTramite, $areaDestino, $detalle)
 {
     global $conexion;
@@ -39,7 +39,7 @@ function guardarTramite($solicitante, $tipoTramite, $areaDestino, $detalle)
     return $sql->execute() ? $conexion->insert_id : false;
 }
 
-// Guarda un trámite enviado por un cliente autenticado (queda vinculado a su cuenta)
+
 function guardarTramitePublico($idUsuario, $solicitante, $correo, $telefono, $tipoTramite, $detalle, $documentoNombre, $documentoMime, $documentoTamano, $documentoContenido)
 {
     global $conexion;
@@ -51,7 +51,7 @@ function guardarTramitePublico($idUsuario, $solicitante, $correo, $telefono, $ti
     return $sql->execute() ? $conexion->insert_id : false;
 }
 
-// Devuelve todos los trámites (sin el documento adjunto), del más reciente al más antiguo
+
 function listarTramites()
 {
     global $conexion;
@@ -63,7 +63,7 @@ function listarTramites()
     return $resultado ? $resultado->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-// Devuelve los trámites registrados por un cliente (para su portal "Mis trámites")
+
 function listarTramitesPorUsuario($idUsuario)
 {
     global $conexion;
@@ -77,7 +77,7 @@ function listarTramitesPorUsuario($idUsuario)
     return $resultado ? $resultado->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-// Devuelve nombre, tipo, contenido y dueño del documento adjunto de un trámite (o null si no tiene)
+
 function obtenerDocumentoTramite($id)
 {
     global $conexion;
@@ -88,7 +88,7 @@ function obtenerDocumentoTramite($id)
     return $resultado ? $resultado->fetch_assoc() : null;
 }
 
-// Cambia el estado de un trámite (pendiente, proceso, atendido, rechazado)
+
 function actualizarEstadoTramite($id, $estado)
 {
     global $conexion;
@@ -97,7 +97,7 @@ function actualizarEstadoTramite($id, $estado)
     return $sql->execute();
 }
 
-// Reasigna el área destino de un trámite
+
 function actualizarAreaTramite($id, $area)
 {
     global $conexion;
@@ -106,7 +106,7 @@ function actualizarAreaTramite($id, $area)
     return $sql->execute();
 }
 
-// Devuelve los detalles de un trámite por su id
+
 function obtenerTramitePorId($id)
 {
     global $conexion;
@@ -120,7 +120,7 @@ function obtenerTramitePorId($id)
     return $resultado ? $resultado->fetch_assoc() : null;
 }
 
-// Elimina un trámite por su id
+
 function eliminarTramite($id)
 {
     global $conexion;

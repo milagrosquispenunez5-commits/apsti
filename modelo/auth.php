@@ -1,14 +1,11 @@
 <?php
-// MODELO — Sesión de usuario (clientes y administradores). Protege el dashboard,
-// el portal del cliente, y las acciones que modifican datos.
+
 require_once __DIR__ . '/usuario.php';
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// Valida correo/clave contra la tabla usuarios y abre sesión si son correctos.
-// Devuelve el usuario autenticado (sin clave_hash) o false.
 function iniciarSesion($correo, $clave)
 {
     $usuario = buscarUsuarioPorCorreo($correo);
@@ -40,7 +37,7 @@ function idUsuarioActual()
     return $_SESSION['usuario_id'] ?? null;
 }
 
-// Corta la ejecución y redirige si no hay sesión con el rol pedido
+
 function requerirRol($rol)
 {
     if (!estaAutenticado() || rolActual() !== $rol) {

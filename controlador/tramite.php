@@ -1,5 +1,5 @@
 <?php
-// CONTROLADOR — Módulo de Trámites (Mesa de Partes).
+
 require_once __DIR__ . '/../modelo/auth.php';
 require_once __DIR__ . '/../modelo/tramite.php';
 require_once __DIR__ . '/../modelo/validacion_archivos.php';
@@ -8,7 +8,7 @@ $action = $_REQUEST['action'] ?? '';
 
 switch ($action) {
     case 'guardar':
-        // Guardar trámite desde el panel de administración
+        
         requerirRol('administrador');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $solicitante = trim($_POST['solicitante'] ?? '');
@@ -28,7 +28,7 @@ switch ($action) {
         exit;
 
     case 'guardar_publico':
-        // Guardar trámite desde la web pública (mesa de partes) o portal del cliente
+        
         header('Content-Type: application/json; charset=utf-8');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
@@ -86,7 +86,7 @@ switch ($action) {
         $documentoMime = null;
         $documentoTamano = null;
         $documentoContenido = null;
-        $tamanoMaximo = 15 * 1024 * 1024; // 15 MB
+        $tamanoMaximo = 15 * 1024 * 1024; 
 
         if (isset($_FILES['documento']) && $_FILES['documento']['error'] !== UPLOAD_ERR_NO_FILE) {
             $documento = $_FILES['documento'];
@@ -133,7 +133,7 @@ switch ($action) {
         exit;
 
     case 'consultar':
-        // Consultar estado de un trámite de manera pública
+        
         header('Content-Type: application/json; charset=utf-8');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
@@ -191,7 +191,7 @@ switch ($action) {
         exit;
 
     case 'actualizar_area':
-        // Reasignar área destino (admin)
+        
         requerirRol('administrador');
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['area_destino'])) {
             $area = $_POST['area_destino'];
@@ -203,7 +203,7 @@ switch ($action) {
         exit;
 
     case 'actualizar_estado':
-        // Cambiar estado del trámite (admin)
+        
         requerirRol('administrador');
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['estado'])) {
             $estado = $_POST['estado'];
@@ -215,7 +215,7 @@ switch ($action) {
         exit;
 
     case 'eliminar':
-        // Eliminar trámite (admin)
+        
         requerirRol('administrador');
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar'])) {
             eliminarTramite((int) $_POST['eliminar']);
@@ -224,7 +224,7 @@ switch ($action) {
         exit;
 
     case 'descargar_documento':
-        // Descargar documento adjunto del trámite (admin o cliente dueño)
+        
         if (!estaAutenticado()) {
             header('Location: ../index.html');
             exit;

@@ -1,8 +1,8 @@
 <?php
-// MODELO — Valida archivos subidos (biblioteca y mesa de partes).
-// Nunca confía en el tipo MIME que manda el navegador ($_FILES[...]['type']):
-// la extensión debe estar en la lista blanca y el contenido real del archivo
-// (detectado con fileinfo) no debe ser de un tipo peligroso (HTML, SVG, script).
+
+
+
+
 
 const EXTENSIONES_ARCHIVO_PERMITIDAS = [
     'pdf'  => 'application/pdf',
@@ -30,8 +30,8 @@ const MIME_REALES_BLOQUEADOS = [
     'text/javascript',
 ];
 
-// Devuelve el tipo MIME seguro que debe guardarse, o null si el archivo no es válido/permitido.
-// El MIME devuelto sale siempre de la lista blanca (nunca del navegador del que sube el archivo).
+
+
 function validarArchivoSubido($nombreOriginal, $rutaTemporal)
 {
     $extension = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));

@@ -1,16 +1,20 @@
 <?php
-// VISTA — Dashboard con menú lateral (sidebar) de 4 secciones.
-// Los datos vienen del modelo; los formularios envían al controlador.
+
+
 require_once __DIR__ . '/../modelo/auth.php';
 requerirRol('administrador');
 
 require_once __DIR__ . '/../modelo/mensaje.php';
 require_once __DIR__ . '/../modelo/tramite.php';
 require_once __DIR__ . '/../modelo/biblioteca.php';
+require_once __DIR__ . '/../modelo/usuario.php';
 
 $mensajes = listarMensajes();
 $tramites = listarTramites();
 $archivos = listarArchivosBiblioteca();
+$usuarios = listarUsuarios();
+$totalAdministradores = contarUsuariosPorRol('administrador');
+$totalClientes = contarUsuariosPorRol('cliente');
 
 $pendientes = count(array_filter($tramites, fn($t) => $t['estado'] === 'pendiente'));
 $enProceso  = count(array_filter($tramites, fn($t) => $t['estado'] === 'proceso'));
@@ -414,6 +418,18 @@ function iconoArchivo($nombreArchivo)
 
         .badge-origen.publico { background: #e5f0ff; color: #1a4fa0; }
         .badge-origen.interno { background: var(--color-bg); color: var(--color-body); }
+
+        .badge-rol {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: .78rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-rol.administrador { background: #fdecea; color: #b30000; }
+        .badge-rol.cliente { background: #e5f0ff; color: #1a4fa0; }
 
         .contacto-tramite { color: #948a85; font-size: .8rem; }
 
@@ -921,15 +937,111 @@ function iconoArchivo($nombreArchivo)
                 </section>
 
                 <section class="seccion" id="usuarios">
+
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="numero"><?php echo count($usuarios); ?></span>
+                            <span class="etiqueta">Cuentas registradas</span>
+                        </div>
+                        <div class="stat">
+                            <span class="numero"><?php echo $totalAdministradores; ?></span>
+                            <span class="etiqueta">Administradores</span>
+                        </div>
+                        <div class="stat">
+                            <span class="numero"><?php echo $totalClientes; ?></span>
+                            <span class="etiqueta">Clientes</span>
+                        </div>
+                    </div>
+
                     <article class="panel">
-                        <h2>👥 Usuarios</h2>
-                        <p>Administra las cuentas con acceso al sistema: docentes, administrativos y estudiantes.</p>
-                        <ul>
-                            <li>Cuentas activas</li>
-                            <li>Roles y permisos</li>
-                            <li>Solicitudes de acceso</li>
-                        </ul>
-                        <div class="vacio" style="margin-top:14px;">Próximamente: gestión de usuarios.</div>
+                        <h2>➕ Crear nueva cuenta</h2>
+                        <form method="post" action="../controlador/usuario.php?action=crear" class="form-grid">
+                            <label>
+                                Nombre completo
+                                <input type="text" name="nombre" placeholder="Nombre y apellidos" required>
+                            </label>
+                            <label>
+                                Correo electrónico
+                                <input type="email" name="correo" placeholder="correo@ejemplo.com" required>
+                            </label>
+                            <label>
+                                Teléfono
+                                <input type="text" name="telefono" placeholder="Opcional">
+                            </label>
+                            <label>
+                                Contraseña
+                                <input type="password" name="clave" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                            </label>
+                            <label>
+                                Rol
+                                <select name="rol" required>
+                                    <option value="cliente">Cliente</option>
+                                    <option value="administrador">Administrador</option>
+                                </select>
+                            </label>
+                            <button type="submit" class="btn-primario">Crear cuenta</button>
+                        </form>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel-cabecera">
+                            <h2>👥 Cuentas registradas</h2>
+                        </div>
+
+                        <?php if (count($usuarios) === 0): ?>
+                            <div class="vacio">Aún no hay usuarios registrados.</div>
+                        <?php else: ?>
+                            <div class="tabla-envoltura">
+                                <table class="tabla-tramites">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Correo</th>
+                                            <th>Teléfono</th>
+                                            <th>Rol</th>
+                                            <th>Registrado</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($usuarios as $u): ?>
+                                            <?php $esUsuarioActual = (int) $u['id'] === idUsuarioActual(); ?>
+                                            <tr>
+                                                <td>
+                                                    <?php echo htmlspecialchars($u['nombre']); ?>
+                                                    <?php if ($esUsuarioActual): ?>
+                                                        <br><small class="contacto-tramite">(Tú)</small>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td><?php echo htmlspecialchars($u['correo']); ?></td>
+                                                <td><?php echo htmlspecialchars($u['telefono'] ?? ''); ?></td>
+                                                <td>
+                                                    <?php if ($esUsuarioActual): ?>
+                                                        <span class="badge-rol <?php echo $u['rol']; ?>"><?php echo $u['rol'] === 'administrador' ? 'Administrador' : 'Cliente'; ?></span>
+                                                    <?php else: ?>
+                                                        <form method="post" action="../controlador/usuario.php?action=actualizar_rol" class="form-estado">
+                                                            <input type="hidden" name="id" value="<?php echo $u['id']; ?>">
+                                                            <select name="rol" class="badge-rol <?php echo $u['rol']; ?>" onchange="this.form.submit()">
+                                                                <option value="cliente" <?php echo $u['rol'] === 'cliente' ? 'selected' : ''; ?>>Cliente</option>
+                                                                <option value="administrador" <?php echo $u['rol'] === 'administrador' ? 'selected' : ''; ?>>Administrador</option>
+                                                            </select>
+                                                        </form>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td><?php echo date('d/m/Y', strtotime($u['fecha_registro'])); ?></td>
+                                                <td class="acciones-tramite">
+                                                    <?php if (!$esUsuarioActual): ?>
+                                                        <form method="post" action="../controlador/usuario.php?action=eliminar" onsubmit="return confirm('¿Eliminar esta cuenta?')">
+                                                            <button type="submit" name="eliminar" value="<?php echo $u['id']; ?>" class="btn-eliminar">Eliminar</button>
+                                                        </form>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
                     </article>
                 </section>
 

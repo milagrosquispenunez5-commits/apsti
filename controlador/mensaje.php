@@ -1,5 +1,5 @@
 <?php
-// CONTROLADOR — Módulo de Mensajes de Contacto.
+
 require_once __DIR__ . '/../modelo/auth.php';
 require_once __DIR__ . '/../modelo/mensaje.php';
 
@@ -7,7 +7,7 @@ $action = $_REQUEST['action'] ?? '';
 
 switch ($action) {
     case 'guardar':
-        // Guardar mensaje de contacto enviado desde la web pública
+        
         header('Content-Type: application/json; charset=utf-8');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
@@ -37,7 +37,7 @@ switch ($action) {
         exit;
 
     case 'eliminar':
-        // Eliminar mensaje desde el panel administrativo (admin)
+        
         requerirRol('administrador');
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar'])) {
             eliminarMensaje((int) $_POST['eliminar']);
@@ -46,7 +46,7 @@ switch ($action) {
         exit;
 
     case 'marcar_leido':
-        // Marcar mensaje como leído desde el panel administrativo (admin)
+        
         requerirRol('administrador');
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
             marcarMensajeLeido((int) $_POST['id']);
